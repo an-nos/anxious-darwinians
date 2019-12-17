@@ -1,0 +1,310 @@
+package darwinian;
+
+import java.util.*;
+
+public class FoldingMap implements IAnimalStateChangeObserver {
+
+    private Vector2d upperBound, lowerBound, jungleUpperBound, jungleLowerBound;
+    private int plantEnergy;
+    List<Animal> animals;
+    List<Plant> plants;
+    HashMap<Vector2d,List<Animal>> animalsByPosition;       //tried TreeSet but failed :(
+    HashMap<Vector2d,Plant> plantsByPosition;
+    private List <Animal> dead;
+    private List <Plant> plantsToBeEaten;
+    private List <IMapStateChangeObserver> mapStateChangeObservers;
+
+    int age;
+    int[] geneFrequency;
+
+    Animal animalBeingObserved;
+    int observeDate;
+    int numOfSuccessors;
+    int numOfChildren;
+    int deathDate;
+
+    //TODO: make a class for animalBeingObserved (?)
+
+    public FoldingMap (int mapWidth, int mapHeight, int startEnergy, int moveEnergy, int plantEnergy, double jungleRatio){
+
+        int jungleHeight = (int) (Math.sqrt(jungleRatio) * mapHeight);
+        int jungleWidth = (int) (Math.sqrt(jungleRatio) * mapWidth);
+
+        this.lowerBound = new Vector2d(0,0);
+        this.upperBound = new Vector2d(mapWidth-1,mapHeight-1);
+
+        //placing jungle in the center
+        this.jungleLowerBound = new Vector2d((mapWidth-1)/2 - (jungleWidth-1)/2,(mapHeight-1)/2 - (jungleHeight-1)/2);
+        this.jungleUpperBound = new Vector2d (jungleLowerBound.x+jungleWidth-1, jungleLowerBound.y+jungleHeight-1);
+
+        this.plantEnergy = plantEnergy;
+
+        this.animals = new ArrayList<>();
+        this.plants = new ArrayList<>();
+        this.dead = new ArrayList<>();
+        this.plantsToBeEaten = new ArrayList<>();
+
+        this.animalsByPosition = new HashMap<>();
+        this.plantsByPosition = new HashMap<>();
+
+        this.mapStateChangeObservers  = new ArrayList<>();
+        this.age = 0;
+
+        this.geneFrequency = new int[Genome.numOfDiffGenes];
+        for(int i = 0; i<Genome.numOfDiffGenes; i++) this.geneFrequency[i]=0;
+
+        this.animalBeingObserved = null;
+        this.numOfSuccessors = 1;
+        this.observeDate = -1;
+
+    }
+
+    public int getWidth() { return this.upperBound.x - this.lowerBound.x + 1; }
+
+    public int getHeight() { return this.upperBound.y - this.lowerBound.y + 1; }
+
+    public int getJungleWidth() { return this.jungleUpperBound.x - this.jungleLowerBound.x + 1; }
+
+    public int getJungleHeight() { return this.jungleUpperBound.y - this.jungleLowerBound.y + 1; }
+
+    public void placeAnimal(Animal animal, Vector2d position){
+        List<Animal> animalsOnThisPosition = animalsAt(animal.getPosition());
+
+        if(animalsOnThisPosition==null){
+            List<Animal> newList = new ArrayList<>();
+            newList.add(animal);
+            this.animalsByPosition.put(position, newList);
+        }
+        else{
+            animalsOnThisPosition.add(animal);
+        }
+    }
+
+    public void removeAnimalFromPosition(Animal animal, Vector2d oldPosition){
+        List<Animal> animalsOnThisPosition = animalsAt(oldPosition);
+        animalsOnThisPosition.remove(animal);
+        if(animalsOnThisPosition.isEmpty()) this.animalsByPosition.remove(oldPosition);
+    }
+
+    void insertPlant(Plant plant){
+        if(this.plants.contains(plant)) return;
+
+        this.plants.add(plant);
+        this.plantsByPosition.put(plant.getPosition(),plant);
+
+    }
+
+    private void removePlants(List<Plant> plantsToBeRemoved){
+        this.plants.removeAll(plantsToBeRemoved);
+        for(Plant plant : plantsToBeRemoved) this.plantsByPosition.remove(plant.getPosition());
+    }
+
+    public List<Animal> animalsAt(Vector2d position){
+        return this.animalsByPosition.get(position);
+    }
+
+    public Plant plantAt(Vector2d position){ return plantsByPosition.get(position); }
+
+    public boolean isInsideJungle(Vector2d position){ return position.follows(this.jungleLowerBound) && position.precedes(this.jungleUpperBound); }
+
+    public boolean allowedPosition(Vector2d position){ return position.follows(this.lowerBound) && position.precedes(this.upperBound); }
+
+    public Vector2d convertToAllowedPosition(Vector2d position){
+
+        if(allowedPosition(position)) return position;
+
+        int x = position.x;
+        int y = position.y;
+
+        if(x>this.upperBound.x) x = this.lowerBound.x;
+        else if(x<this.lowerBound.x) x = this.upperBound.x;
+
+        if(y>this.upperBound.y) y = this.lowerBound.y;
+        else if(y<this.lowerBound.y) y = this.lowerBound.y;
+
+        return new Vector2d(x,y);
+    }
+
+    Vector2d randomPosition(){
+        Vector2d result;
+        int area = this.getHeight()*this.getWidth();
+        int i = 0;
+        do{
+            Random randomGenerator = new Random();
+            int x = randomGenerator.nextInt(this.upperBound.x + 1);
+            int y = randomGenerator.nextInt(this.upperBound.y + 1);
+            result = new Vector2d(x, y);
+            i++;
+        }while(isOccupied(result) && i<area);
+        return result;
+    }
+
+    Vector2d randomPositionInJungle(){
+        Vector2d result;
+        int jungleArea = this.getJungleHeight()*this.getJungleWidth();
+        int i=0;
+        do {
+            Random randomGenerator = new Random();
+            int x = randomGenerator.nextInt(this.jungleUpperBound.x - this.jungleLowerBound.x + 1);
+            int y = randomGenerator.nextInt(this.jungleUpperBound.y - this.jungleLowerBound.y + 1);
+            result = new Vector2d(this.jungleLowerBound.x + x, this.jungleLowerBound.y + y);
+            i++;
+        } while(isOccupied(result) && i<jungleArea);
+        return result;
+
+    }
+
+    public boolean isOccupied(Vector2d position){
+        if(this.animalsByPosition.get(position) == null){
+            return this.plantsByPosition.get(position) != null;
+        }
+        return false;
+    }
+
+    @Override
+    public void positionChanged(Animal animal, Vector2d oldPosition) {
+        removeAnimalFromPosition(animal, oldPosition);
+        placeAnimal(animal, animal.getPosition());
+        if(plantAt(animal.getPosition())!=null) {
+            this.plantsToBeEaten.add(plantAt(animal.getPosition()));
+        }
+    }
+
+    @Override
+    public void animalBorn(Animal animal) {
+        this.animals.add(animal);
+        animal.addObserver(this);
+        if(animal.isSuccessor) this.numOfSuccessors++;
+        placeAnimal(animal, animal.getPosition());
+
+        for(int i = 0; i < Genome.numOfDiffGenes; i++) this.geneFrequency[i]+=animal.genome.presentGenes[i];
+
+    }
+
+    @Override
+    public void animalDied(Animal animal) {
+        this.dead.add(animal);
+    }
+
+    void corpseSweeper(){
+        this.animals.removeAll(this.dead);
+        for(Animal animal : this.dead){
+            removeAnimalFromPosition(animal, animal.getPosition());
+            for(int i = 0; i< Genome.numOfDiffGenes; i++) this.geneFrequency[i]-=animal.genome.presentGenes[i];
+        }
+        this.dead.clear();
+    }
+
+    private void eatingPlants(){
+        for(Plant plant : this.plantsToBeEaten){
+
+            List<Animal> competingAnimals = animalsAt(plant.getPosition());
+            competingAnimals.sort(new Comparator<Animal>() {
+                @Override
+                public int compare(Animal animal1, Animal animal2) {
+                    return animal2.getEnergy() - animal1.getEnergy();
+                }
+            });
+
+            int maxEnergy = competingAnimals.get(0).getEnergy();
+            int numOfEquals = 0;
+
+            for(Animal animal : competingAnimals){
+                if(animal.getEnergy()==maxEnergy){
+                    numOfEquals++;
+                }
+            }
+
+            int energyForEach = plant.energy/=numOfEquals;
+
+            for(Animal animal: competingAnimals){
+                if(animal.getEnergy() == maxEnergy) {
+                    animal.eat(energyForEach);
+                }
+                else break;
+            }
+        }
+        removePlants(plantsToBeEaten);
+        plantsToBeEaten.clear();
+    }
+
+    private void growNewPlants(){
+        int jungleArea = this.getJungleHeight()*this.getJungleWidth();
+        int i = 0;
+        Vector2d positionInsideJungle=this.randomPositionInJungle();
+
+        if(!this.isOccupied(positionInsideJungle)) {
+            Plant junglePlant = new Plant(positionInsideJungle, this.plantEnergy);
+            this.insertPlant(junglePlant);
+        }
+
+        Vector2d positionOutsideJungle;
+        i = 0;
+        int areaWithoutJungle = this.getHeight()*this.getWidth() - jungleArea;
+        do{
+            positionOutsideJungle = this.randomPosition();
+            i++;
+        } while((this.isInsideJungle(positionOutsideJungle) && i<areaWithoutJungle));
+
+        if(!this.isOccupied(positionOutsideJungle)){
+            Plant firstPlant = new Plant(positionOutsideJungle, this.plantEnergy);
+            this.insertPlant(firstPlant);
+        }
+    }
+
+    private void mating(){
+        List<Vector2d> keysToMating =new ArrayList<>();
+        Set<Vector2d> keys = this.animalsByPosition.keySet();
+
+        for(Vector2d key : keys){
+            if(this.animalsAt(key).size()>1) keysToMating.add(key);
+        }
+
+        for(Vector2d position : keysToMating){
+            List<Animal> matingCompetitors = animalsAt(position);
+            matingCompetitors.sort(new Comparator<Animal>() {
+                @Override
+                public int compare(Animal animal1, Animal animal2) {
+                    return animal2.getEnergy() - animal1.getEnergy();
+                }
+            });
+
+            Animal first = null;
+            Animal second = null;
+            for(Animal animal : matingCompetitors){
+                if(animal.canMate()){
+                    second = first;
+                    first = animal;
+                }
+                if(second != null) break;
+            }
+            if(second!= null){
+                first.mate(second);
+                if(first.equals(this.animalBeingObserved) || second.equals(this.animalBeingObserved)) this.numOfChildren++;
+
+            }
+
+        }
+
+    }
+
+    public void day(){
+        corpseSweeper();
+        for(Animal animal : animals) animal.move();
+        eatingPlants();
+        mating();
+        growNewPlants();
+        this.age++;         //this should be in MapStats but animals need it to know their birth date
+        if(this.animalBeingObserved != null) System.out.println(this.age-this.animalBeingObserved.birthDate);
+        for(IMapStateChangeObserver observer : this.mapStateChangeObservers) observer.onDayEnd();
+    }
+
+    public void addRemoveObserver(IMapStateChangeObserver observer){
+        this.mapStateChangeObservers.add(observer);
+    }
+
+    public void removeObserver (IMapStateChangeObserver observer){
+        this.mapStateChangeObservers.remove(observer);
+    }
+
+}

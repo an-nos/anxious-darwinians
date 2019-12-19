@@ -164,7 +164,7 @@ public class FoldingMap implements IAnimalStateChangeObserver {
         if(this.animalsByPosition.get(position) == null){
             return this.plantsByPosition.get(position) != null;
         }
-        return false;
+        return true;
     }
 
     @Override
@@ -239,7 +239,12 @@ public class FoldingMap implements IAnimalStateChangeObserver {
     private void growNewPlants(){
         int jungleArea = this.getJungleHeight()*this.getJungleWidth();
         int i = 0;
-        Vector2d positionInsideJungle=this.randomPositionInJungle();
+        Vector2d positionInsideJungle;
+
+        do{
+            positionInsideJungle = this.randomPositionInJungle();
+            i++;
+        }while(this.isOccupied(positionInsideJungle) && i<jungleArea);
 
         if(!this.isOccupied(positionInsideJungle)) {
             Plant junglePlant = new Plant(positionInsideJungle, this.plantEnergy);
@@ -252,7 +257,7 @@ public class FoldingMap implements IAnimalStateChangeObserver {
         do{
             positionOutsideJungle = this.randomPosition();
             i++;
-        } while((this.isInsideJungle(positionOutsideJungle) && i<areaWithoutJungle));
+        } while((this.isInsideJungle(positionOutsideJungle) && this.isOccupied(positionOutsideJungle) && i<areaWithoutJungle));
 
         if(!this.isOccupied(positionOutsideJungle)){
             Plant firstPlant = new Plant(positionOutsideJungle, this.plantEnergy);

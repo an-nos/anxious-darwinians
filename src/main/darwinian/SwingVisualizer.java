@@ -22,9 +22,9 @@ public class SwingVisualizer implements IMapStateChangeObserver {
         this.secondMap = secondMap;
 
 
-        this.mapPanelSize = new Vector2d(425, 425);
+        this.mapPanelSize = new Vector2d(440, 440);
         this.sidePanelSize = new Vector2d( 350, this.mapPanelSize.y);
-        this.frameSize = new Vector2d(this.mapPanelSize.x+this.sidePanelSize.x, this.mapPanelSize.y);
+        this.frameSize = new Vector2d(this.mapPanelSize.x+this.sidePanelSize.x+20, this.mapPanelSize.y+38);
 
         this.map.addMapStateChangeObserver(this);
         this.mapPanel = new MapPanel(this.mapPanelSize, this.map);
@@ -58,6 +58,7 @@ public class SwingVisualizer implements IMapStateChangeObserver {
         if(this.secondMap != null){
             this.secondSidePanel.displayStatistics();
             this.secondMapPanel.renderMap();
+            this.secondMapPanel.paused = this.sidePanel.pausePressed;
         }
         this.mapPanel.paused = this.sidePanel.pausePressed;
     }

@@ -39,7 +39,6 @@ public class MapPanel {
                     public void mouseClicked(MouseEvent e) {
                         super.mouseClicked(e);
                         if(paused && map.animalsAt(position)!=null) {
-
                             map.chosenAnimal = new ChosenAnimal(map.getTopAnimalAt(position),map.getAge());
                             System.out.println(map.chosenAnimal.animal.getPosition());
                         }
@@ -78,10 +77,10 @@ public class MapPanel {
     public void insertAnimal(Vector2d position) {
         Animal animal = map.animalsAt(position).get(0);
         ImageIcon catIcon = this.mapIcons.getCatImage(animal.getEnergyLevel(), this.map.isInsideJungle(position));
-
+        if(this.map.chosenAnimal!=null && map.animalsAt(position).contains(this.map.chosenAnimal.animal))
+            catIcon = this.mapIcons.getTacImage(animal.getEnergyLevel());
         JLabel animalLabel = this.labels.get(position);
         animalLabel.setIcon(catIcon);
-
     }
 
     public void insertPlant(Vector2d position) {
@@ -93,7 +92,7 @@ public class MapPanel {
 
     public void renderMap() {
         try {
-            Thread.sleep(50);
+            Thread.sleep(100);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

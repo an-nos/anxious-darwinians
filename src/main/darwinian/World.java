@@ -75,8 +75,6 @@ public class World {
             }
         }
 
-
-
         SwingVisualizer visualizerTest = null;
         try {
             visualizerTest = new SwingVisualizer(map1, map2);
@@ -94,13 +92,12 @@ public class World {
     }
 
     //TODO: Saving statistics
-    //TODO: Clicking animal on second map
     //TODO: show chosen animal and his tombstone
     //TODO: get animals of the most common genome
     //TODO: THREADS?
+    //TODO: repair size of window
     /*
     rip chosenAnimal, show that animal is chosen
-    equals, hashcode in genome
     maybe fast forward??? jump n days
      */
 }

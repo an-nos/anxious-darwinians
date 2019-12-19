@@ -80,14 +80,14 @@ public class SidePanel implements ActionListener {
         for(StatField statField : StatField.values()){
             this.statLabels.get(statField).setText(statField.toString() + map.getStats(statField));
         }
-        this.dominatingGenomeText.setText("Dominating genome: " + map.stats.dominatingGenome);
+        this.dominatingGenomeText.setText("Dominating genome: \n" + map.stats.dominatingGenome);
         displayStatisticOfAnimalBeingObserved();
     }
 
     public void displayStatisticOfAnimalBeingObserved(){
         if(map.chosenAnimal == null) return;
 
-        this.chosenAnimalGenomeText.setText("Genome: "+this.map.chosenAnimal.animal.getGenome());
+        this.chosenAnimalGenomeText.setText("Genome: \n"+this.map.chosenAnimal.animal.getGenome());
         this.chosenAnimalChildrenText.setText("Number of children: "+this.map.chosenAnimal.numOfChildren);
         this.chosenAnimalSuccessorsText.setText("Number of successors: "+this.map.chosenAnimal.numOfSuccessors);
 

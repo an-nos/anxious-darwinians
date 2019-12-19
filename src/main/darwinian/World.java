@@ -100,7 +100,6 @@ public class World {
     //TODO: THREADS?
     /*
     rip chosenAnimal, show that animal is chosen
-    Jesus easter egg
     equals, hashcode in genome
     maybe fast forward??? jump n days
      */

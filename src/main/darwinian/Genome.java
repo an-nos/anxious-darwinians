@@ -51,7 +51,6 @@ public class Genome {
             this.presentGenes[randomGene]++;
         }
         Collections.sort(this.genes);
-
     }
 
     private void correctGenome(){
@@ -71,4 +70,28 @@ public class Genome {
         }
     }
 
+    public String toString(){
+        StringBuilder geneStr= new StringBuilder();
+        for(int gene : this.genes){
+            geneStr.append(gene);
+        }
+        return geneStr.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(! (obj instanceof Genome)) return false;
+        return this.genes.equals((Genome) obj);
+    }
+
+    @Override
+    public int hashCode() {
+        long hash = 0;
+
+        for(int i = 0; i < numOfDiffGenes; i++){
+            hash = (hash+this.presentGenes[i]*32)%Integer.MAX_VALUE;
+        }
+
+        return (int) hash;
+    }
 }

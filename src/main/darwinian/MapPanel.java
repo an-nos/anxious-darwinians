@@ -13,9 +13,10 @@ public class MapPanel {
     Vector2d mapPanelSize;
     private FoldingMap map;
     private MapIcons mapIcons;
-    private Map<Vector2d, JLabel> labels = new HashMap<>();
+    private Map<Vector2d, JLabel> labels;
     JPanel mapPanel;
     boolean paused = false;
+
 
     public MapPanel(Vector2d mainPanelSize, FoldingMap map) throws IOException {
         this.map = map;
@@ -38,12 +39,9 @@ public class MapPanel {
                     public void mouseClicked(MouseEvent e) {
                         super.mouseClicked(e);
                         if(paused && map.animalsAt(position)!=null) {
-                            map.animalBeingObserved =map.animalsAt(position).get(0);
-                            map.animalBeingObserved.isSuccessor = true;
-                            map.observeDate = map.age;
-                            map.numOfSuccessors = 0;
-                            map.numOfChildren = 0;
-                            System.out.println(map.animalBeingObserved.getPosition());
+
+                            map.chosenAnimal = new ChosenAnimal(map.getTopAnimalAt(position),map.getAge());
+                            System.out.println(map.chosenAnimal.animal.getPosition());
                         }
                     }
                 });
@@ -63,6 +61,7 @@ public class MapPanel {
 
     private JLabel createEmptyLabel() throws IOException {
         JLabel label = new JLabel();
+        label.setSize(this.mapPanelSize.x / this.map.getWidth(), this.mapPanelSize.y / this.map.getHeight());
         label.setText("");
         label.setOpaque(true);
         label.setForeground(Color.WHITE);
@@ -83,9 +82,6 @@ public class MapPanel {
         JLabel animalLabel = this.labels.get(position);
         animalLabel.setIcon(catIcon);
 
-        animalLabel.setText(""+map.animalsAt(position).get(0).getEnergy());
-        animalLabel.setHorizontalTextPosition(JLabel.CENTER);
-        animalLabel.setVerticalTextPosition(JLabel.CENTER);
     }
 
     public void insertPlant(Vector2d position) {
@@ -97,7 +93,7 @@ public class MapPanel {
 
     public void renderMap() {
         try {
-            Thread.sleep(200);
+            Thread.sleep(50);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

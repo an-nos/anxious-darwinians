@@ -5,7 +5,7 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-public class Animal {
+public class Animal implements Comparable {
     private int startEnergy;
     int moveEnergy;
     int energy;
@@ -27,7 +27,7 @@ public class Animal {
         this.childrenCount = 0;
         this.direction = this.direction.randomDirection();
         this.position = map.randomPosition();
-        this.birthDate = map.age;
+        this.birthDate = map.getAge();
         this.isSuccessor = false;
     }
 
@@ -47,7 +47,9 @@ public class Animal {
 
     }
 
-    public int getAge(){ return this.map.age - this.birthDate; }
+    public Genome getGenome(){ return this.genome; }
+
+    public int getAge(){ return this.map.getAge() - this.birthDate; }
 
     public Vector2d getPosition(){ return this.position; }
 
@@ -108,10 +110,14 @@ public class Animal {
 
             child.position = randomPositionNearParents;
             child.position = map.convertToAllowedPosition(child.position);
-            this.giveBirthTo(child);
-            child.isSuccessor = (this.isSuccessor || other.isSuccessor) && child.birthDate<=map.observeDate;
+
+
+            if(map.chosenAnimal!=null)
+                child.isSuccessor = (this.isSuccessor || other.isSuccessor) && child.birthDate>=map.chosenAnimal.observeDate;
             this.childrenCount++;
             other.childrenCount++;
+
+            this.giveBirthTo(child);
 
             return child;
         }
@@ -143,4 +149,9 @@ public class Animal {
         for(IAnimalStateChangeObserver observer: observers) observer.animalDied(this);
     }
 
+    @Override
+    public int compareTo(Object other) {
+        if(! (other instanceof Animal)) return -1;
+        return ((Animal) other).getEnergy() - this.getEnergy();
+    }
 }

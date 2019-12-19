@@ -1,67 +1,125 @@
 package darwinian;
 
-public class MapStats implements IMapStateChangeObserver{
+import java.util.HashMap;
+import java.util.Map;
 
-    public FoldingMap map;
-    public int age, numOfAnimals, numOfPlants, dominatingGene, avgLifespan, avgEnergy, avgChildrenCount;
+public class MapStats implements IMapStateChangeObserver{       //should it be an attribute of map?
+
+    private FoldingMap map;
+    private int lifeSpanSum;
+    private int deadCount;
+    private int childrenCount;
+    public Genome dominatingGenome;
+    private Map<Genome, Integer> genomeCount;
+
+    private Map<StatField, Integer> stats;
+    private Map<StatField, Long> totals;
 
     public MapStats(FoldingMap map){
         this.map=map;
-        this.map.addRemoveObserver(this);
+        this.map.addMapStateChangeObserver(this);
+
+        this.genomeCount = new HashMap<>();
+        this.stats = new HashMap<>();
+        this.totals = new HashMap<>();
+        this.lifeSpanSum = 0;
+        this.deadCount = 0;
+
+        for(StatField stat: StatField.values()){
+            this.stats.put(stat, 0);
+            this.totals.put(stat, (long) 0);
+        }
     }
 
-    private void setCurrentAnimalCount() { this.numOfAnimals = this.map.animals.size(); }
+    public void updateGenomeCounter(Genome genome){
+        if(this.genomeCount.containsKey(genome)) this.genomeCount.put(genome, this.genomeCount.get(genome)+1);
+        else this.genomeCount.put(genome, 1);
+    }
 
-    private void setCurrentPlantCount() { this.numOfPlants = this.map.plants.size(); }
+    public void setDominatingGenome(){
+        int maxOccurrences = 0;
+        Genome maxGenome = null;
 
-    private void setDominatingGene() {        //TODO: test
-        int dominatingGene = 0;
-        int dominatingGeneFrequency = 0;
-        for(int i = 0; i < Genome.numOfDiffGenes; i++){
-            if(this.map.geneFrequency[i]>this.map.geneFrequency[dominatingGene]){
-                dominatingGene = i;
-                dominatingGeneFrequency = this.map.geneFrequency[i];
+        for(Genome genome : this.genomeCount.keySet()){
+            if(this.genomeCount.get(genome) > maxOccurrences){
+                maxOccurrences = this.genomeCount.get(genome);
+                maxGenome = genome;
             }
         }
-        this.dominatingGene = dominatingGene;
+
+        this.stats.put(StatField.GENOME_OCCURRENCES, maxOccurrences);
+        this.dominatingGenome = maxGenome;
+    }
+
+    public void updateDeadCount(int age){
+        this.lifeSpanSum += age;
+        this.deadCount++;
+    }
+
+    public void updateChildrenCount(){ this.childrenCount++; }
+
+    private void setCurrentAnimalCount() {
+        StatField numOfAnimals = StatField.NUM_OF_ANIMALS;
+        this.stats.put(numOfAnimals, this.map.getAnimalsSize());
+    }
+
+    private void setCurrentPlantCount() {
+        this.stats.put(StatField.NUM_OF_PLANTS, this.map.getPlantsSize());
+    }
+
+    private void setAvgLifespan(){
+        if(this.deadCount == 0) this.stats.put(StatField.AVG_LIFESPAN_DEAD, 0);
+        else this.stats.put(StatField.AVG_LIFESPAN_DEAD, this.lifeSpanSum / this.deadCount);
     }
 
     private void setCurrentAverageAnimalEnergy() {
-        if(this.numOfAnimals == 0){
-            this.avgEnergy = 0;
+        if(this.stats.get(StatField.NUM_OF_ANIMALS) == 0){
+            this.stats.put(StatField.AVG_ENERGY, 0);
             return;
         }
+
         int sumOfEnergy = 0;
         for(Animal animal : this.map.animals){
             sumOfEnergy+=animal.getEnergy();
         }
-        this.avgEnergy = sumOfEnergy / this.numOfAnimals;
+        this.stats.put(StatField.AVG_ENERGY, sumOfEnergy / this.stats.get(StatField.NUM_OF_ANIMALS));
     }
 
-    private void setAge(){
-        this.age=this.map.age;
+    private void setBornToday(){
+        this.stats.put(StatField.BORN_TODAY, this.childrenCount);
     }
 
     private void setAvgChildrenCount(){
-        if(this.numOfAnimals == 0){
-            this.avgChildrenCount = 0;
-            return;
+        if(this.deadCount!=0) this.stats.put(StatField.AVG_CHILDREN, this.childrenCount/this.stats.get(StatField.NUM_OF_ANIMALS));
+    }
+
+    private void setDay(){
+        this.stats.put(StatField.DAY, this.map.getAge());
+    }
+
+    private void updateTotals(){
+        for(StatField stat: StatField.values()){
+            this.totals.put(stat, this.totals.get(stat)+this.stats.get(stat));
         }
-        int childrenSum = 0;
-        for(Animal animal: this.map.animals){
-            childrenSum+=animal.childrenCount;
-        }
-        this.avgChildrenCount = childrenSum / this.numOfAnimals;
+    }
+
+    public String getStats(StatField field){
+        return this.stats.get(field).toString();
     }
 
     @Override
     public void onDayEnd() {
+        this.setDay();
+        this.setDominatingGenome();
         this.setCurrentAnimalCount();
         this.setCurrentAnimalCount();
         this.setCurrentPlantCount();
-        this.setDominatingGene();
         this.setCurrentAverageAnimalEnergy();
-        this.setAge();
         this.setAvgChildrenCount();
+        setBornToday();
+        this.setAvgLifespan();
+        this.updateTotals();
+        this.childrenCount = 0;
     }
+
 }

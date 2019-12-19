@@ -10,46 +10,49 @@ import java.util.Map;
 public class SidePanel implements ActionListener {
 
     public JPanel sidePanel;
-    public int height;
-    public int width;
+
+    private Vector2d size;
     public JButton pauseButton;
-    public JButton continueButton;
     public boolean pausePressed;
     public FoldingMap map;
-    public MapStats mapStats;
-    JLabel ageText, animalCountText, plantsCountText, dominatingGeneText, avgAnimalEnergyText, avgChildrenCountText;
-    JLabel chosenAnimalChildrenText, chosenAnimalSuccessorsText, chosenAnimalDeathDate;
-    Map<Vector2d, JLabel> labels;
 
-    public SidePanel(int width, int height, FoldingMap map){
+    JLabel dominatingGenomeText;
 
-        this.height = height;
-        this.width = width;
+    private JLabel chosenAnimalChildrenText, chosenAnimalSuccessorsText, chosenAnimalDeathDate, chosenAnimalGenomeText;
+    private Map<Vector2d, JLabel> labels;
+
+    private Map<StatField, JLabel> statLabels;
+
+    public SidePanel(Vector2d size, FoldingMap map, boolean secondMap){
+
+        this.size = size;
         this.sidePanel = new JPanel();
-        this.sidePanel.setLayout(new GridLayout(10, 10,0,0));
-        this.sidePanel.setSize(width, height);
-        this.pauseButton = new JButton("pause");
-        this.pauseButton.addActionListener(this);
-        this.sidePanel.add(this.pauseButton);
+        this.sidePanel.setSize(this.size.y, this.size.x);
+        this.sidePanel.setLayout(new GridLayout(0,1));
+        this.sidePanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
 
-        this.continueButton = new JButton("continue");
-        this.continueButton.addActionListener(this);
-        this.sidePanel.add(this.continueButton);
+        if(!secondMap) {
+            this.pauseButton = new JButton("pause");
+            this.pauseButton.setPreferredSize(new Dimension(10, 20));
+            this.pauseButton.addActionListener(this);
+            this.sidePanel.add(this.pauseButton);
+        }
 
         this.map = map;
         this.labels = new HashMap<>();
-        this.mapStats = new MapStats(map);
 
-        this.ageText = addTextLabel("Current day: ");
-        this.animalCountText = addTextLabel("Number of living animals: ");
-        this.plantsCountText = addTextLabel("Number of plants on map: ");
-        this.dominatingGeneText = addTextLabel("Dominating gene: ");
-        this.avgAnimalEnergyText = addTextLabel("Average energy: ");
-        this.avgChildrenCountText = addTextLabel( "Average number of children: ");
+        this.statLabels = new HashMap<>();
+        for(StatField stat : StatField.values()){
+            this.statLabels.put(stat, addTextLabel(stat.toString()));
+        }
 
+        this.dominatingGenomeText = addTextLabel("");
+
+        this.chosenAnimalGenomeText = addTextLabel("");
         this.chosenAnimalChildrenText = addTextLabel("");
         this.chosenAnimalSuccessorsText = addTextLabel("");
         this.chosenAnimalDeathDate = addTextLabel("");
+
     }
 
     @Override
@@ -57,34 +60,39 @@ public class SidePanel implements ActionListener {
         String command = actionEvent.getActionCommand();
         if(command.equals("pause")){
             this.pausePressed=true;
+            this.pauseButton.setText("continue");
         }else if(command.equals("continue")){
             this.pausePressed=false;
+            this.pauseButton.setText("pause");
         }
     }
 
     JLabel addTextLabel(String initialText){
         JLabel textLabel = new JLabel();
+        textLabel.setVerticalAlignment(JLabel.TOP);
+        textLabel.setHorizontalAlignment(JLabel.CENTER);
         textLabel.setText(initialText);
         this.sidePanel.add(textLabel);
         return textLabel;
     }
 
     public void displayStatistics(){
-        this.ageText.setText("Current day: "+mapStats.age);
-        this.animalCountText.setText("Number of living animals: "+mapStats.numOfAnimals);
-        this.plantsCountText.setText("Number of plants on map: "+mapStats.numOfPlants);
-        this.dominatingGeneText.setText("Dominating gene: "+mapStats.dominatingGene);
-        this.avgAnimalEnergyText.setText("Average energy: "+mapStats.avgEnergy);
-        this.avgChildrenCountText.setText("Average number of children: "+mapStats.avgChildrenCount);
-
+        for(StatField statField : StatField.values()){
+            this.statLabels.get(statField).setText(statField.toString() + map.getStats(statField));
+        }
+        this.dominatingGenomeText.setText("Dominating genome: " + map.stats.dominatingGenome);
         displayStatisticOfAnimalBeingObserved();
     }
 
     public void displayStatisticOfAnimalBeingObserved(){
-        if(map.animalBeingObserved == null) return;
+        if(map.chosenAnimal == null) return;
 
-        this.chosenAnimalChildrenText.setText("Number of children: "+this.map.numOfChildren);
-        this.chosenAnimalSuccessorsText.setText("Number of successors: "+this.map.numOfSuccessors);
+        this.chosenAnimalGenomeText.setText("Genome: "+this.map.chosenAnimal.animal.getGenome());
+        this.chosenAnimalChildrenText.setText("Number of children: "+this.map.chosenAnimal.numOfChildren);
+        this.chosenAnimalSuccessorsText.setText("Number of successors: "+this.map.chosenAnimal.numOfSuccessors);
+
+        if(this.map.chosenAnimal.deathDate != -1)
+            this.chosenAnimalDeathDate.setText("Death date: "+this.map.chosenAnimal.deathDate);
+        else this.chosenAnimalDeathDate.setText("");
     }
 }
-

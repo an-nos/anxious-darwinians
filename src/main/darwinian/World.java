@@ -92,10 +92,9 @@ public class World {
     }
 
     //TODO: Saving statistics
-    //TODO: show chosen animal and his tombstone
-    //TODO: get animals of the most common genome
     //TODO: THREADS?
     //TODO: repair size of window
+    //TODO: hashmap of free positions
     /*
     rip chosenAnimal, show that animal is chosen
     maybe fast forward??? jump n days

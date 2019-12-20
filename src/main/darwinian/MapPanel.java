@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 public class MapPanel implements IButtonPressedObserver {
 
@@ -15,11 +16,13 @@ public class MapPanel implements IButtonPressedObserver {
     private MapIcons mapIcons;
     private Map<Vector2d, JLabel> labels;
     JPanel mapPanel;
+    private int speed;
     boolean paused = false;
 
-    public MapPanel(Vector2d mainPanelSize, FoldingMap map) throws IOException {
+    public MapPanel(Vector2d mainPanelSize, FoldingMap map, int speed) throws IOException {
         this.map = map;
         this.mapPanelSize = mainPanelSize;
+        this.speed = speed;
         this.mapIcons = new MapIcons(this.mapPanelSize.x / this.map.getWidth(), this.mapPanelSize.y / this.map.getHeight());
 
         this.labels = new HashMap<>();
@@ -56,7 +59,6 @@ public class MapPanel implements IButtonPressedObserver {
                 }
             }
         }
-
     }
 
     private JLabel createEmptyLabel() throws IOException {
@@ -95,9 +97,15 @@ public class MapPanel implements IButtonPressedObserver {
         this.labels.get(position).setIcon(this.mapIcons.getTacGraveIcon());
     }
 
+    public void insertKindred(List<Animal> kindred){
+        for(Animal animal : kindred){
+            this.labels.get(animal.getPosition()).setIcon(this.mapIcons.getKindredIcon());
+        }
+    }
+
     public void renderMap() {
         try {
-            Thread.sleep(100);
+            Thread.sleep(speed);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -125,5 +133,10 @@ public class MapPanel implements IButtonPressedObserver {
     public void pausePressed() {
         if(!this.paused) this.paused = true;
         else this.paused = false;
+    }
+
+    @Override
+    public void showDominatingPressed() {
+        this.insertKindred(map.getSuperiorRace());
     }
 }

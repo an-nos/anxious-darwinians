@@ -14,7 +14,7 @@ public class SidePanel implements ActionListener {
     public JPanel sidePanel;
 
     private Vector2d size;
-    public JButton pauseButton;
+    private JButton pauseButton, showDominatingButton;
     public boolean pausePressed;
     public FoldingMap map;
 
@@ -34,6 +34,7 @@ public class SidePanel implements ActionListener {
         this.sidePanel.setSize(this.size.y, this.size.x);
         this.sidePanel.setLayout(new GridLayout(0,1));
         this.sidePanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
+        this.sidePanel.setAlignmentY(JPanel.CENTER_ALIGNMENT);
         this.observers = new ArrayList<>();
 
         if(!secondMap) {
@@ -41,7 +42,12 @@ public class SidePanel implements ActionListener {
             this.pauseButton.setPreferredSize(new Dimension(10, 20));
             this.pauseButton.addActionListener(this);
             this.sidePanel.add(this.pauseButton);
+
+            this.showDominatingButton = new JButton("show dominating");
+            this.showDominatingButton.addActionListener(this);
+            this.sidePanel.add(this.showDominatingButton);
         }
+
 
         this.map = map;
         this.labels = new HashMap<>();
@@ -63,15 +69,21 @@ public class SidePanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         String command = actionEvent.getActionCommand();
-        if(command.equals("pause")){
-            this.pausePressed=true;
-            this.pauseButton.setText("continue");
-        }else if(command.equals("continue")){
-            this.pausePressed=false;
-            this.pauseButton.setText("pause");
+
+        if(command.equals("show dominating") && this.pausePressed){
+            for(IButtonPressedObserver observer : this.observers) observer.showDominatingPressed();
+        }
+        else{
+            if (command.equals("pause")) {
+                this.pausePressed = true;
+                this.pauseButton.setText("continue");
+            } else if (command.equals("continue")) {
+                this.pausePressed = false;
+                this.pauseButton.setText("pause");
+            }
+            for (IButtonPressedObserver observer : this.observers) observer.pausePressed();
         }
 
-        for(IButtonPressedObserver observer: this.observers) observer.pausePressed();
     }
 
     JLabel addTextLabel(String initialText){

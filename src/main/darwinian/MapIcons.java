@@ -14,7 +14,7 @@ public class MapIcons {
     private List<ImageIcon> catIcons, catInJungleIcons, tacIcons;
 
 
-    ImageIcon plantIcon, backgroundIcon, jungleIcon, plantInJungleIcon, tacGraveIcon;
+    ImageIcon plantIcon, backgroundIcon, jungleIcon, plantInJungleIcon, tacGraveIcon, kindredIcon;
 
     int width, height;
 
@@ -37,6 +37,7 @@ public class MapIcons {
         this.jungleIcon = getScaledIcon(ImageIO.read(new File("src\\main\\darwinian\\img\\jungleBackground.png")));
         this.plantInJungleIcon = getScaledIcon(ImageIO.read(new File("src\\main\\darwinian\\img\\toastInJungle.png")));
         this.tacGraveIcon = getScaledIcon(ImageIO.read(new File("src\\main\\darwinian\\img\\tombstone.png")));
+        this.kindredIcon = getScaledIcon(ImageIO.read(new File("src\\main\\darwinian\\img\\kindred.png")));
     }
 
 
@@ -51,6 +52,8 @@ public class MapIcons {
     ImageIcon getTacGraveIcon(){
         return this.tacGraveIcon;
     }
+
+    ImageIcon getKindredIcon(){ return this.kindredIcon; }
 
     private ImageIcon getScaledIcon(BufferedImage image){
         return new ImageIcon (image.getScaledInstance(this.width, this.height, Image.SCALE_SMOOTH));

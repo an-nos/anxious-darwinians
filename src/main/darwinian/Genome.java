@@ -23,8 +23,8 @@ public class Genome {
         for(int i=0; i<numOfDiffGenes; i++) this.presentGenes[i]=0;
 
         Random randomGenerator = new Random();
-        int firstDivider = randomGenerator.nextInt(numOfGenes);
-        int secondDivider = firstDivider + randomGenerator.nextInt(numOfGenes - firstDivider);
+        int firstDivider = randomGenerator.nextInt(numOfGenes - 1);
+        int secondDivider = firstDivider + 1 + randomGenerator.nextInt(numOfGenes - firstDivider);
 
         this.genes.addAll(fromMother.genes.subList(0,firstDivider));
         this.genes.addAll(fromFather.genes.subList(firstDivider,secondDivider));
@@ -35,7 +35,7 @@ public class Genome {
         correctGenome();
     }
 
-    public Genome (){   //random genome
+    public Genome (){
         this.presentGenes = new Integer[numOfDiffGenes];
         this.genes = new ArrayList<>();
 
@@ -71,7 +71,7 @@ public class Genome {
     }
 
     public String toString(){
-        StringBuilder geneStr= new StringBuilder();
+        StringBuilder geneStr = new StringBuilder();
         for(int gene : this.genes){
             geneStr.append(gene);
         }
@@ -81,7 +81,7 @@ public class Genome {
     @Override
     public boolean equals(Object obj) {
         if(! (obj instanceof Genome)) return false;
-        return this.genes.equals((Genome) obj);
+        return this.genes.equals(((Genome) obj).genes);
     }
 
     @Override

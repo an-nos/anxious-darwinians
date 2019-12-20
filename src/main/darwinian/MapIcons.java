@@ -11,10 +11,10 @@ import java.util.List;
 
 public class MapIcons {
 
-    List<ImageIcon> catIcons, catInJungleIcons, tacIcons;
+    private List<ImageIcon> catIcons, catInJungleIcons, tacIcons;
 
 
-    ImageIcon plantIcon, backgroundIcon, jungleIcon, plantInJungleIcon;
+    ImageIcon plantIcon, backgroundIcon, jungleIcon, plantInJungleIcon, tacGraveIcon;
 
     int width, height;
 
@@ -36,6 +36,7 @@ public class MapIcons {
         this.backgroundIcon = getScaledIcon(ImageIO.read(new File("src\\main\\darwinian\\img\\background.png")));
         this.jungleIcon = getScaledIcon(ImageIO.read(new File("src\\main\\darwinian\\img\\jungleBackground.png")));
         this.plantInJungleIcon = getScaledIcon(ImageIO.read(new File("src\\main\\darwinian\\img\\toastInJungle.png")));
+        this.tacGraveIcon = getScaledIcon(ImageIO.read(new File("src\\main\\darwinian\\img\\tombstone.png")));
     }
 
 
@@ -45,6 +46,10 @@ public class MapIcons {
 
     ImageIcon getTacImage(int energyLevel){
         return this.tacIcons.get(energyLevel-1);
+    }
+
+    ImageIcon getTacGraveIcon(){
+        return this.tacGraveIcon;
     }
 
     private ImageIcon getScaledIcon(BufferedImage image){

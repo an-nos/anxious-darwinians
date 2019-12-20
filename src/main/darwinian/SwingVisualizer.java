@@ -21,7 +21,6 @@ public class SwingVisualizer implements IMapStateChangeObserver {
         this.map = map;
         this.secondMap = secondMap;
 
-
         this.mapPanelSize = new Vector2d(440, 440);
         this.sidePanelSize = new Vector2d( 350, this.mapPanelSize.y);
         this.frameSize = new Vector2d(this.mapPanelSize.x+this.sidePanelSize.x+20, this.mapPanelSize.y+38);
@@ -32,6 +31,7 @@ public class SwingVisualizer implements IMapStateChangeObserver {
         this.frame = new JFrame("Evolution");
         this.frame.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
         this.sidePanel = new SidePanel(this.sidePanelSize, this.map, false);
+        this.sidePanel.addObserver(this.mapPanel);
 
         this.frame.add(this.mapPanel.mapPanel);
         this.frame.add(this.sidePanel.sidePanel);
@@ -43,6 +43,7 @@ public class SwingVisualizer implements IMapStateChangeObserver {
             this.frame.add(this.secondMapPanel.mapPanel);
             this.secondSidePanel = new SidePanel(this.sidePanelSize, this.secondMap, true);
             this.frame.add(this.secondSidePanel.sidePanel);
+            this.sidePanel.addObserver(this.secondMapPanel);
         }
 
         this.frame.setSize(this.frameSize.x, this.frameSize.y);
@@ -50,16 +51,19 @@ public class SwingVisualizer implements IMapStateChangeObserver {
         this.frame.setVisible(true);
     }
 
-
     @Override
     public void onDayEnd() {
-        this.sidePanel.displayStatistics();
-        this.mapPanel.renderMap();
+        this.sidePanel.displayStatistics();     //move this to sidePanel
+        this.mapPanel.renderMap();              //move this to mapPanel
         if(this.secondMap != null){
             this.secondSidePanel.displayStatistics();
             this.secondMapPanel.renderMap();
-            this.secondMapPanel.paused = this.sidePanel.pausePressed;
         }
-        this.mapPanel.paused = this.sidePanel.pausePressed;
     }
+
+    @Override
+    public void onAnimalChosen() {
+        this.sidePanel.displayStatisticOfAnimalBeingObserved();
+    }
+
 }

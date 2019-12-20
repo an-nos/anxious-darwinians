@@ -8,14 +8,12 @@ import java.util.Random;
 
 
 public class Genome {
+
     List<Integer> genes;
     Integer[] presentGenes;
     public static int numOfGenes = 32;
     public static int numOfDiffGenes = 8;
 
-    public Genome (List<Integer> genes){
-        this.genes = genes;
-    }
 
     public Genome (Genome fromMother, Genome fromFather){
 
@@ -40,10 +38,12 @@ public class Genome {
     public Genome (){   //random genome
         this.presentGenes = new Integer[numOfDiffGenes];
         this.genes = new ArrayList<>();
+
         for(int i=0; i<numOfDiffGenes; i++){
             this.genes.add(i);
             this.presentGenes[i]=1;
         }
+
         for(int i = numOfDiffGenes; i<numOfGenes; i++) {
             Random randomGenerator = new Random();
             int randomGene = randomGenerator.nextInt(numOfDiffGenes);

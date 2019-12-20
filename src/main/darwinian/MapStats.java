@@ -3,7 +3,7 @@ package darwinian;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MapStats implements IMapStateChangeObserver{       //should it be an attribute of map?
+public class MapStats {
 
     private FoldingMap map;
     private int lifeSpanSum;
@@ -16,8 +16,7 @@ public class MapStats implements IMapStateChangeObserver{       //should it be a
     private Map<StatField, Long> totals;
 
     public MapStats(FoldingMap map){
-        this.map=map;
-        this.map.addMapStateChangeObserver(this);
+        this.map = map;
 
         this.genomeCount = new HashMap<>();
         this.stats = new HashMap<>();
@@ -34,6 +33,11 @@ public class MapStats implements IMapStateChangeObserver{       //should it be a
     public void updateGenomeCounter(Genome genome){
         if(this.genomeCount.containsKey(genome)) this.genomeCount.put(genome, this.genomeCount.get(genome)+1);
         else this.genomeCount.put(genome, 1);
+    }
+
+    public void decreaseGenomeCounter(Genome genome){
+        if(this.genomeCount.get(genome).equals(1)) this.genomeCount.remove(genome);
+        else this.genomeCount.put(genome, this.genomeCount.get(genome)-1);
     }
 
     public void setDominatingGenome(){
@@ -107,16 +111,14 @@ public class MapStats implements IMapStateChangeObserver{       //should it be a
         return this.stats.get(field).toString();
     }
 
-    @Override
-    public void onDayEnd() {
+    public void updateAllStats() {
         this.setDay();
         this.setDominatingGenome();
-        this.setCurrentAnimalCount();
         this.setCurrentAnimalCount();
         this.setCurrentPlantCount();
         this.setCurrentAverageAnimalEnergy();
         this.setAvgChildrenCount();
-        setBornToday();
+        this.setBornToday();
         this.setAvgLifespan();
         this.updateTotals();
         this.childrenCount = 0;

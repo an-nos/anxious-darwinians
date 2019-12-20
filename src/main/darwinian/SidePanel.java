@@ -4,8 +4,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 public class SidePanel implements ActionListener {
 
@@ -23,6 +25,8 @@ public class SidePanel implements ActionListener {
 
     private Map<StatField, JLabel> statLabels;
 
+    private List<IButtonPressedObserver> observers;
+
     public SidePanel(Vector2d size, FoldingMap map, boolean secondMap){
 
         this.size = size;
@@ -30,6 +34,7 @@ public class SidePanel implements ActionListener {
         this.sidePanel.setSize(this.size.y, this.size.x);
         this.sidePanel.setLayout(new GridLayout(0,1));
         this.sidePanel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
+        this.observers = new ArrayList<>();
 
         if(!secondMap) {
             this.pauseButton = new JButton("pause");
@@ -65,6 +70,8 @@ public class SidePanel implements ActionListener {
             this.pausePressed=false;
             this.pauseButton.setText("pause");
         }
+
+        for(IButtonPressedObserver observer: this.observers) observer.pausePressed();
     }
 
     JLabel addTextLabel(String initialText){
@@ -94,5 +101,13 @@ public class SidePanel implements ActionListener {
         if(this.map.chosenAnimal.deathDate != -1)
             this.chosenAnimalDeathDate.setText("Death date: "+this.map.chosenAnimal.deathDate);
         else this.chosenAnimalDeathDate.setText("");
+    }
+
+    public void addObserver(IButtonPressedObserver observer){
+        this.observers.add(observer);
+    }
+
+    public void removeObserver(IButtonPressedObserver observer){
+        this.observers.remove(observer);
     }
 }

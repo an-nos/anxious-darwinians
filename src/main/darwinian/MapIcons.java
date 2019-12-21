@@ -39,7 +39,6 @@ public class MapIcons {
         this.kindredIcon = getScaledIcon(ImageIO.read(new File("src\\main\\resources\\img\\kindred.png")));
     }
 
-
     ImageIcon getCatImage(int energyLevel, boolean inJungle){
         return inJungle ? this.catInJungleIcons.get(energyLevel-1) : this.catIcons.get(energyLevel-1);
     }

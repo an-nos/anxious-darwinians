@@ -269,7 +269,7 @@ public class FoldingMap implements IAnimalStateChangeObserver {
                 else break;
             }
         }
-        removePlants(this.plantsToBeEaten);
+        this.removePlants(this.plantsToBeEaten);
         this.plantsToBeEaten.clear();
     }
 

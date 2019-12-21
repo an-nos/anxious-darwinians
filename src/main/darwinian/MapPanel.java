@@ -16,13 +16,13 @@ public class MapPanel implements IButtonPressedObserver {
     private MapIcons mapIcons;
     private Map<Vector2d, JLabel> labels;
     JPanel panel;
-    private int speed;
+    private int delay;
     boolean paused = false;
 
-    public MapPanel(Vector2d mainPanelSize, FoldingMap map, int speed) throws IOException {
+    public MapPanel(Vector2d mainPanelSize, FoldingMap map, int delay) throws IOException {
         this.map = map;
         this.size = mainPanelSize;
-        this.speed = speed;
+        this.delay = delay;
         this.mapIcons = new MapIcons(this.size.x / this.map.getWidth(), this.size.y / this.map.getHeight());
 
         this.labels = new HashMap<>();
@@ -105,7 +105,7 @@ public class MapPanel implements IButtonPressedObserver {
 
     public void renderMap() {
         try {
-            Thread.sleep(speed);
+            Thread.sleep(delay);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -127,6 +127,10 @@ public class MapPanel implements IButtonPressedObserver {
                 }
             }
         }
+    }
+
+    public void changeDelay(int newDelay){
+        this.delay = newDelay;
     }
 
     @Override

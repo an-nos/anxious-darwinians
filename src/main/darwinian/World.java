@@ -53,11 +53,11 @@ public class World {
             }
         }
 
-        SwingVisualizer visualizerTest = null;
+        SwingVisualizer swingVisualizer = null;
         try {
-            visualizerTest = new SwingVisualizer(map1, map2);
+            swingVisualizer = new SwingVisualizer(map1, map2);
             while(true){
-                if(visualizerTest.pausePressed){
+                if(swingVisualizer.pausePressed){
                     Thread.sleep(5);
                     continue;
                 }
@@ -68,8 +68,5 @@ public class World {
             e.printStackTrace();
         }
     }
-
-    //TODO: Get top ever genome in statistics
-    //TODO: THREADS?
 
 }

@@ -1,6 +1,7 @@
 package darwinian;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -12,7 +13,7 @@ public class SidePanel {
     private Vector2d size;
     public FoldingMap map;
 
-    private JLabel titleText, chosenAnimalText;
+    private JLabel chosenAnimalText;
     private JLabel dominatingGenomeText, chosenAnimalChildrenText, chosenAnimalSuccessorsText, chosenAnimalDeathDate, chosenAnimalGenomeText;
 
     private Map<StatField, JLabel> statLabels;
@@ -44,6 +45,7 @@ public class SidePanel {
                 buttonContainer.add(button);
             }
             this.panel.add(buttonContainer);
+
         }
 
         if(buttonList != null) this.addTextLabel("Statistics of the first map:");
@@ -63,6 +65,7 @@ public class SidePanel {
         this.chosenAnimalDeathDate = addTextLabel("");
 
     }
+
 
     JLabel addTextLabel(String initialText){
         JLabel textLabel = new JLabel();

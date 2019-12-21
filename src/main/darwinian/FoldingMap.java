@@ -6,7 +6,7 @@ public class FoldingMap implements IAnimalStateChangeObserver {
 
     private Vector2d upperBound, lowerBound, jungleUpperBound, jungleLowerBound;
     private int plantEnergy;
-    List<Animal> animals;
+    private List<Animal> animals;
     private List<Plant> plants;
     private HashMap<Vector2d,List<Animal>> animalsByPosition;
     private HashMap<Vector2d,Plant> plantsByPosition;
@@ -17,8 +17,7 @@ public class FoldingMap implements IAnimalStateChangeObserver {
     private List <Plant> plantsToBeEaten;
     private List <IMapStateChangeObserver> mapStateChangeObservers;
 
-    private List <Vector2d> freePositionsInJungle;
-    private List <Vector2d> freePositionsOutsideJungle;
+    private List <Vector2d> freePositionsInJungle, freePositionsOutsideJungle;
 
     MapStats stats;
     private int age;
@@ -33,7 +32,6 @@ public class FoldingMap implements IAnimalStateChangeObserver {
         this.lowerBound = new Vector2d(0,0);
         this.upperBound = new Vector2d(mapWidth-1,mapHeight-1);
 
-        //placing jungle in the center
         this.jungleLowerBound = new Vector2d((mapWidth-1)/2 - (jungleWidth-1)/2,(mapHeight-1)/2 - (jungleHeight-1)/2);
         this.jungleUpperBound = new Vector2d (jungleLowerBound.x+jungleWidth-1, jungleLowerBound.y+jungleHeight-1);
 
@@ -79,6 +77,8 @@ public class FoldingMap implements IAnimalStateChangeObserver {
 
     public int getAge() { return this.age; }
 
+    public List<Animal> getAnimals(){ return this.animals; }
+
     public int getAnimalsSize(){ return this.animals.size(); }
 
     public int getPlantsSize(){ return this.plants.size(); }
@@ -111,7 +111,6 @@ public class FoldingMap implements IAnimalStateChangeObserver {
             this.animalsByPosition.put(position, newList);
 
             this.removeFreePosition(position);
-
         }
         else{
             animalsOnThisPosition.add(animal);

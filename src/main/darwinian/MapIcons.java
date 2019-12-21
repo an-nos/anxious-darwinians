@@ -13,7 +13,6 @@ public class MapIcons {
 
     private List<ImageIcon> catIcons, catInJungleIcons, tacIcons;
 
-
     ImageIcon plantIcon, backgroundIcon, jungleIcon, plantInJungleIcon, tacGraveIcon, kindredIcon;
 
     private int width, height;
@@ -27,7 +26,7 @@ public class MapIcons {
         this.tacIcons = new ArrayList<>();
 
         for(int i=1; i<=8; i++){
-            this.catIcons.add(getScaledIcon(ImageIO.read(new File("src\\main\\darwinian\\img\\staticCat"+i+".png"))));
+            this.catIcons.add(getScaledIcon(ImageIO.read(new File("src\\main\\darwinian\\img\\cat"+i+".png"))));
             this.catInJungleIcons.add(getScaledIcon(ImageIO.read(new File("src\\main\\darwinian\\img\\catInJungle"+i+".png"))));
             this.tacIcons.add(getScaledIcon(ImageIO.read(new File("src\\main\\darwinian\\img\\tac"+i+".png"))));
         }

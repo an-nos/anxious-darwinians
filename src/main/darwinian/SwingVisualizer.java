@@ -2,6 +2,7 @@ package darwinian;
 
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -21,7 +22,6 @@ public class SwingVisualizer implements IMapStateChangeObserver {
     private SidePanel sidePanel, secondSidePanel;
     private MapPanel mapPanel;
     private MapPanel secondMapPanel;
-    private JPanel buttonPanel;
     private JPanel statsPanel;
     private int speed;
     boolean pausePressed;
@@ -47,7 +47,7 @@ public class SwingVisualizer implements IMapStateChangeObserver {
         }
         else{
             this.mapPanelSize = new Vector2d(400, 400);
-            this.sidePanelSize = new Vector2d( 400, 320);
+            this.sidePanelSize = new Vector2d( 400, 350);
             this.frameSize = new Vector2d(this.mapPanelSize.x*2+24, this.mapPanelSize.y+this.sidePanelSize.y);
         }
 
@@ -84,31 +84,31 @@ public class SwingVisualizer implements IMapStateChangeObserver {
         this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.frame.setVisible(true);
 
+        insertSpeedSlider();
+
     }
 
     private List<JButton> createButtonList(){
         List<JButton> buttonList = new ArrayList<>();
-        this.pauseButton = new JButton("pause");
+
+        this.pauseButton = createButton("pause", buttonList);
         this.pauseButton.addActionListener(this::pause);
-        if(this.secondMap!= null) this.pauseButton.setPreferredSize(new Dimension(130,15));
-        else this.pauseButton.setPreferredSize(new Dimension(130,20));
-        buttonList.add(this.pauseButton);
 
-        this.showDominatingButton = new JButton("show dominating");
+        this.showDominatingButton = createButton("show dominating", buttonList);
         this.showDominatingButton.addActionListener(e -> showDominating());
-        this.showDominatingButton.setPreferredSize(new Dimension(130,15));
-        if(this.secondMap!= null) this.showDominatingButton.setPreferredSize(new Dimension(130,15));
-        else this.showDominatingButton.setPreferredSize(new Dimension(130,25));
 
-        buttonList.add(this.showDominatingButton);
-
-        this.saveButton = new JButton("save");
+        this.saveButton = createButton("save", buttonList);
         this.saveButton.addActionListener(e -> saveToFile());
-        if(this.secondMap!= null) this.saveButton.setPreferredSize(new Dimension(130,15));
-        else this.saveButton.setPreferredSize(new Dimension(130,25));
-        buttonList.add(this.saveButton);
 
         return buttonList;
+    }
+
+    private JButton createButton(String text, List<JButton> buttonList){
+        JButton button = new JButton(text);
+        if(this.secondMap!= null) button.setPreferredSize(new Dimension(130,15));
+        else button.setPreferredSize(new Dimension(130,20));
+        buttonList.add(button);
+        return button;
     }
 
     @Override
@@ -146,8 +146,7 @@ public class SwingVisualizer implements IMapStateChangeObserver {
     private void saveToFile(){
         if(!pausePressed) return;
         JFileChooser fileChooser = new JFileChooser();
-        int retval = fileChooser.showSaveDialog(this.saveButton);
-        if (retval == JFileChooser.APPROVE_OPTION) {
+        if (fileChooser.showSaveDialog(this.saveButton) == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
             if (file == null) return;
             if (!((File) file).getName().toLowerCase().endsWith(".txt"))
@@ -174,7 +173,27 @@ public class SwingVisualizer implements IMapStateChangeObserver {
             textArea.append(statStr+"\n");
 
     }
-        public void addObserver(IButtonPressedObserver observer){
+
+    private void insertSpeedSlider(){
+        JSlider speedSlider = new JSlider(JSlider.HORIZONTAL,
+                0, 200, 20);
+        speedSlider.setSize(200, 10);
+        speedSlider.addChangeListener(e -> changeDelay(e));
+        speedSlider.setMajorTickSpacing(40);
+        speedSlider.setMinorTickSpacing(10);
+        this.sidePanel.addTextLabel("Change delay:");
+        this.sidePanel.panel.add(speedSlider);
+    }
+
+    private void changeDelay(ChangeEvent event){
+        JSlider source = (JSlider)event.getSource();
+        if (!source.getValueIsAdjusting()) {
+            int newDelay = (int)source.getValue();
+            for(IButtonPressedObserver observer : this.observers) observer.changeDelay(newDelay);
+        }
+    }
+
+    public void addObserver(IButtonPressedObserver observer){
         this.observers.add(observer);
     }
 

@@ -11,7 +11,8 @@ public class MapStats {
     private int lifeSpanSum;
     private int deadCount;
     private int childrenCount;
-    private Genome dominatingGenome;
+    private Genome dominatingGenome, everDominatingGenome;
+    int everDominatingGenomeCount;
     private Map<Genome, Integer> genomeCount;
 
     private Map<StatField, Integer> stats;
@@ -25,6 +26,7 @@ public class MapStats {
         this.totals = new HashMap<>();
         this.lifeSpanSum = 0;
         this.deadCount = 0;
+        this.everDominatingGenomeCount = 0;
 
         for(StatField stat: StatField.values()){
             this.stats.put(stat, 0);
@@ -59,6 +61,11 @@ public class MapStats {
 
         this.stats.put(StatField.GENOME_OCCURRENCES, maxOccurrences);
         this.dominatingGenome = maxGenome;
+
+        if(maxOccurrences>this.everDominatingGenomeCount){
+            this.everDominatingGenomeCount = maxOccurrences;
+            this.everDominatingGenome = this.dominatingGenome;
+        }
     }
 
     public void updateDeadCount(int age){
@@ -89,7 +96,7 @@ public class MapStats {
         }
 
         int sumOfEnergy = 0;
-        for(Animal animal : this.map.animals){
+        for(Animal animal : this.map.getAnimals()){
             sumOfEnergy+=animal.getEnergy();
         }
         this.stats.put(StatField.AVG_ENERGY, sumOfEnergy / this.stats.get(StatField.NUM_OF_ANIMALS));
@@ -126,6 +133,8 @@ public class MapStats {
             line.append(this.totals.get(stat)/this.stats.get(StatField.DAY));
             avgStats.add(line.toString());
         }
+        avgStats.add("Ever dominating genome: "+this.everDominatingGenome);
+        avgStats.add("Highest number of animals with ever dominating genome: "+this.everDominatingGenomeCount);
         return avgStats;
     }
 

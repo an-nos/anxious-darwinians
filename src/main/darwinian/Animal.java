@@ -6,15 +6,13 @@ import java.util.*;
 import java.util.List;
 
 public class Animal implements Comparable {
-    private int startEnergy;
-    int moveEnergy;
-    int energy;
-    int childrenCount;
-    Vector2d position;
+    private int startEnergy, moveEnergy;
+    private int energy;
+    private Vector2d position;
     private MapDirection direction = MapDirection.NORTH;
     private FoldingMap map;
-    Genome genome;
-    int birthDate;
+    private Genome genome;
+    private int birthDate;
     boolean isSuccessor;
     private List<IAnimalStateChangeObserver> observers = new ArrayList<>();
 
@@ -24,7 +22,6 @@ public class Animal implements Comparable {
         this.energy = initialEnergy;
         this.genome = genome;
         this.map = map;
-        this.childrenCount = 0;
         this.direction = this.direction.randomDirection();
         this.position = map.randomPosition();
         this.birthDate = map.getAge();
@@ -93,13 +90,14 @@ public class Animal implements Comparable {
                 if(map.isOccupied(position)) positionsNearParents.add(position);
             }
 
-            if(!positionsNearParents.isEmpty()) randomPositionNearParents = this.map.randomPositionOf(positionsNearParents);
-            else randomPositionNearParents = this.position.add(direction.randomDirection().toUnitVector());
+            if(!positionsNearParents.isEmpty())
+                randomPositionNearParents = this.map.randomPositionOf(positionsNearParents);
+            else
+                randomPositionNearParents = this.position.add(direction.randomDirection().toUnitVector());
 
             Animal child = new Animal(this.startEnergy, (int) ((this.energy + other.energy) * 0.25), this.moveEnergy, new Genome(this.genome, other.genome), map);
 
             this.energy *= (0.75);
-
             other.energy *= (0.75);
 
             child.position = randomPositionNearParents;
@@ -107,8 +105,6 @@ public class Animal implements Comparable {
 
             if(map.hasChosenAnimal())
                 child.isSuccessor = (this.isSuccessor || other.isSuccessor) && child.birthDate >= map.getChosenAnimal().observeDate;
-            this.childrenCount++;
-            other.childrenCount++;
 
             this.giveBirthTo(child);
 

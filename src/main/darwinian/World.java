@@ -44,7 +44,10 @@ public class World {
         for(int i = 0; i<numOfAnimals; i++) {
             Animal cat = new Animal(startEnergy, startEnergy, moveEnergy, new Genome(), map1);
             map1.animalBorn(cat);
-            if(secondMap) map2.animalBorn(cat);
+            if(secondMap) {
+                Animal secondCat = new Animal(startEnergy, startEnergy, moveEnergy, new Genome(), map2);
+                map2.animalBorn(secondCat);
+            }
         }
 
         SwingVisualizer swingVisualizer = null;

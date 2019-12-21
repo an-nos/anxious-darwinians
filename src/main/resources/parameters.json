@@ -6,5 +6,5 @@
   "plantEnergy": 30,
   "jungleRatio": 0.1,
   "numOfAnimals": 300,
-  "secondMap": false
+  "secondMap": true
 }

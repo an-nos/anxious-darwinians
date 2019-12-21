@@ -16,7 +16,7 @@ public class MapIcons {
 
     ImageIcon plantIcon, backgroundIcon, jungleIcon, plantInJungleIcon, tacGraveIcon, kindredIcon;
 
-    int width, height;
+    private int width, height;
 
     public MapIcons(int width, int height) throws IOException {
         this.width = width;

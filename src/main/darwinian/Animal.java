@@ -105,8 +105,8 @@ public class Animal implements Comparable {
             child.position = randomPositionNearParents;
             child.position = map.convertToAllowedPosition(child.position);
 
-            if(map.chosenAnimal!=null)
-                child.isSuccessor = (this.isSuccessor || other.isSuccessor) && child.birthDate>=map.chosenAnimal.observeDate;
+            if(map.hasChosenAnimal())
+                child.isSuccessor = (this.isSuccessor || other.isSuccessor) && child.birthDate >= map.getChosenAnimal().observeDate;
             this.childrenCount++;
             other.childrenCount++;
 

@@ -23,7 +23,7 @@ public class FoldingMap implements IAnimalStateChangeObserver {
     MapStats stats;
     private int age;
 
-    ChosenAnimal chosenAnimal;
+    private ChosenAnimal chosenAnimal;
 
     public FoldingMap (int mapWidth, int mapHeight, int startEnergy, int moveEnergy, int plantEnergy, double jungleRatio){
 
@@ -85,9 +85,9 @@ public class FoldingMap implements IAnimalStateChangeObserver {
 
     public Animal getTopAnimalAt(Vector2d position){ return (Animal) Collections.min(this.animalsAt(position)); }
 
-    public List<Animal> getSuperiorRace(){
-            return this.animalsByGenome.get(this.stats.getDominatingGenome());
-    }
+    public List<Animal> getSuperiorRace(){ return this.animalsByGenome.get(this.stats.getDominatingGenome()); }
+
+    public ChosenAnimal getChosenAnimal(){ return this.chosenAnimal; }
 
     private void addFreePosition(Vector2d position){
         if(isOccupied(position)) return;
@@ -118,7 +118,7 @@ public class FoldingMap implements IAnimalStateChangeObserver {
         }
     }
 
-    public void removeAnimalFromPosition(Animal animal, Vector2d oldPosition){
+    private void removeAnimalFromPosition(Animal animal, Vector2d oldPosition){
         List<Animal> animalsOnThisPosition = animalsAt(oldPosition);
         animalsOnThisPosition.remove(animal);
         if(animalsOnThisPosition.isEmpty()){
@@ -127,7 +127,7 @@ public class FoldingMap implements IAnimalStateChangeObserver {
         }
     }
 
-    void insertPlant(Plant plant){
+    private void insertPlant(Plant plant){
         if(this.plants.contains(plant)) return;
         this.plants.add(plant);
         this.plantsByPosition.put(plant.getPosition(),plant);
@@ -185,8 +185,6 @@ public class FoldingMap implements IAnimalStateChangeObserver {
         int randomIndex = randomGenerator.nextInt(positions.size());
         return positions.get(randomIndex);
     }
-
-
 
     public boolean isOccupied(Vector2d position){
         if(this.animalsByPosition.get(position) == null){
@@ -313,7 +311,7 @@ public class FoldingMap implements IAnimalStateChangeObserver {
             }
             if(second!= null){
                 first.mate(second);
-                if(chosenAnimal != null && (first.equals(this.chosenAnimal.animal) || second.equals(this.chosenAnimal.animal)))
+                if(this.hasChosenAnimal() && (first.equals(this.chosenAnimal.animal) || second.equals(this.chosenAnimal.animal)))
                     this.chosenAnimal.numOfChildren++;
             }
 
@@ -332,9 +330,13 @@ public class FoldingMap implements IAnimalStateChangeObserver {
         for(IMapStateChangeObserver observer : this.mapStateChangeObservers) observer.onDayEnd();
     }
 
+    public boolean hasChosenAnimal(){
+        return this.chosenAnimal != null;
+    }
+
     public void chooseAnimal(Vector2d position){
         this.chosenAnimal = new ChosenAnimal(this.getTopAnimalAt(position), this.age);
-        for(IMapStateChangeObserver observer : this.mapStateChangeObservers) observer.onAnimalChosen();
+        for(IMapStateChangeObserver observer : this.mapStateChangeObservers) observer.onAnimalChosen(this);
     }
 
     public void addMapStateChangeObserver(IMapStateChangeObserver observer){

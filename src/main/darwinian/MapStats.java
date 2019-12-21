@@ -14,7 +14,6 @@ public class MapStats {
     private Genome dominatingGenome;
     private Map<Genome, Integer> genomeCount;
 
-
     private Map<StatField, Integer> stats;
     private Map<StatField, Long> totals;
 

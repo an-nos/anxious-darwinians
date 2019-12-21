@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SwingVisualizer implements IMapStateChangeObserver {
-    //TODO: should  visualizer be observer of SidePanel and MapPanel to communicate them??
     private FoldingMap map;
     private FoldingMap secondMap;
 
@@ -41,12 +40,17 @@ public class SwingVisualizer implements IMapStateChangeObserver {
         this.statsPanel = new JPanel();
         this.statsPanel.setLayout(new BoxLayout(this.statsPanel, BoxLayout.Y_AXIS));
 
+        if(this.secondMap == null){
+            this.mapPanelSize = new Vector2d(600, 600);
+            this.sidePanelSize = new Vector2d(430, 600);
+            this.frameSize = new Vector2d(this.mapPanelSize.x+this.sidePanelSize.x, this.mapPanelSize.y+40);
+        }
+        else{
+            this.mapPanelSize = new Vector2d(400, 400);
+            this.sidePanelSize = new Vector2d( 400, 320);
+            this.frameSize = new Vector2d(this.mapPanelSize.x*2+24, this.mapPanelSize.y+this.sidePanelSize.y);
+        }
 
-        if(this.secondMap == null) this.mapPanelSize = new Vector2d(600, 600);
-        else this.mapPanelSize = new Vector2d(400, 400);
-
-        this.sidePanelSize = new Vector2d( 350, this.mapPanelSize.y);
-        this.frameSize = new Vector2d(this.mapPanelSize.x+this.sidePanelSize.x+20, this.mapPanelSize.y+38);
         this.speed = 10;
         if(secondMap != null) this.speed/=2;
         this.map.addMapStateChangeObserver(this);
@@ -59,19 +63,22 @@ public class SwingVisualizer implements IMapStateChangeObserver {
         this.addObserver(this.mapPanel);
 
         this.frame.add(this.mapPanel.panel);
-        this.frame.add(this.sidePanel.panel);
 
         if(this.secondMap != null){
-            this.frameSize = new Vector2d(this.mapPanelSize.x+this.sidePanelSize.x+8, this.mapPanelSize.y*2);
+
             this.secondMap.addMapStateChangeObserver(this);
             this.secondMapPanel = new MapPanel(this.mapPanelSize, this.secondMap, this.speed);
 
             this.secondSidePanel = new SidePanel(this.sidePanelSize, this.secondMap, null);
             this.frame.add(this.secondMapPanel.panel);
-            this.frame.add(this.secondSidePanel.panel);
 
             this.addObserver(this.secondMapPanel);
         }
+
+        this.frame.add(this.sidePanel.panel);
+        if(this.secondMap != null)
+        this.frame.add(this.secondSidePanel.panel);
+
 
         this.frame.setSize(this.frameSize.x, this.frameSize.y);
         this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -83,14 +90,22 @@ public class SwingVisualizer implements IMapStateChangeObserver {
         List<JButton> buttonList = new ArrayList<>();
         this.pauseButton = new JButton("pause");
         this.pauseButton.addActionListener(this::pause);
+        if(this.secondMap!= null) this.pauseButton.setPreferredSize(new Dimension(130,15));
+        else this.pauseButton.setPreferredSize(new Dimension(130,20));
         buttonList.add(this.pauseButton);
 
         this.showDominatingButton = new JButton("show dominating");
         this.showDominatingButton.addActionListener(e -> showDominating());
+        this.showDominatingButton.setPreferredSize(new Dimension(130,15));
+        if(this.secondMap!= null) this.showDominatingButton.setPreferredSize(new Dimension(130,15));
+        else this.showDominatingButton.setPreferredSize(new Dimension(130,25));
+
         buttonList.add(this.showDominatingButton);
 
         this.saveButton = new JButton("save");
         this.saveButton.addActionListener(e -> saveToFile());
+        if(this.secondMap!= null) this.saveButton.setPreferredSize(new Dimension(130,15));
+        else this.saveButton.setPreferredSize(new Dimension(130,25));
         buttonList.add(this.saveButton);
 
         return buttonList;
@@ -98,8 +113,8 @@ public class SwingVisualizer implements IMapStateChangeObserver {
 
     @Override
     public void onDayEnd() {
-        this.sidePanel.displayStatistics();     //move this to sidePanel
-        this.mapPanel.renderMap();              //move this to mapPanel
+        this.sidePanel.displayStatistics();
+        this.mapPanel.renderMap();
         if(this.secondMap != null){
             this.secondSidePanel.displayStatistics();
             this.secondMapPanel.renderMap();
@@ -107,8 +122,9 @@ public class SwingVisualizer implements IMapStateChangeObserver {
     }
 
     @Override
-    public void onAnimalChosen() {
-        this.sidePanel.displayStatisticOfAnimalBeingObserved();
+    public void onAnimalChosen(FoldingMap map) {
+        if(map == this.map) this.sidePanel.displayStatisticOfAnimalBeingObserved();
+        else this.secondSidePanel.displayStatisticOfAnimalBeingObserved();
     }
 
     private void pause(ActionEvent actionEvent){

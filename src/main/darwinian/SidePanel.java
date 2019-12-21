@@ -12,10 +12,8 @@ public class SidePanel {
     private Vector2d size;
     public FoldingMap map;
 
-    JLabel dominatingGenomeText;
-
-    private JLabel chosenAnimalChildrenText, chosenAnimalSuccessorsText, chosenAnimalDeathDate, chosenAnimalGenomeText;
-    private Map<Vector2d, JLabel> labels;
+    private JLabel titleText, chosenAnimalText;
+    private JLabel dominatingGenomeText, chosenAnimalChildrenText, chosenAnimalSuccessorsText, chosenAnimalDeathDate, chosenAnimalGenomeText;
 
     private Map<StatField, JLabel> statLabels;
 
@@ -24,24 +22,40 @@ public class SidePanel {
 
         this.size = size;
         this.panel = new JPanel();
-        this.panel.setSize(this.size.y, this.size.x);
 
-        this.panel.setLayout(new GridLayout(0,1));
-        this.panel.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
+        if(buttonList != null){
+            this.panel.setLayout(new GridLayout(22,1));
+            this.panel.setSize(this.size.y, this.size.x);
+        }
+        else{
+            this.panel.setLayout(new GridLayout(20,1));
+            this.panel.setSize(this.size.y, this.size.x);
+        }
+        this.panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
         this.panel.setAlignmentY(JFrame.TOP_ALIGNMENT);
 
         this.map = map;
 
-        if(buttonList != null)
-            for(JButton button: buttonList) this.panel.add(button);
+        JPanel buttonContainer = new JPanel();
+        buttonContainer.setLayout(new GridLayout(1,3));
+        if(buttonList != null){
 
-        this.labels = new HashMap<>();
+            for(JButton button: buttonList){
+                buttonContainer.add(button);
+            }
+            this.panel.add(buttonContainer);
+        }
+
+        if(buttonList != null) this.addTextLabel("Statistics of the first map:");
+        else this.addTextLabel("Statistics of the second map:");
 
         this.statLabels = new HashMap<>();
         for(StatField stat : StatField.values()){
             this.statLabels.put(stat, addTextLabel(stat.toString()));
         }
         this.dominatingGenomeText = addTextLabel("");
+
+        this.chosenAnimalText = this.addTextLabel("");
 
         this.chosenAnimalGenomeText = addTextLabel("");
         this.chosenAnimalChildrenText = addTextLabel("");
@@ -52,7 +66,7 @@ public class SidePanel {
 
     JLabel addTextLabel(String initialText){
         JLabel textLabel = new JLabel();
-        textLabel.setVerticalAlignment(JLabel.TOP);
+        textLabel.setVerticalAlignment(JLabel.CENTER);
         textLabel.setHorizontalAlignment(JLabel.LEFT);
         textLabel.setText(initialText);
         this.panel.add(textLabel);
@@ -63,19 +77,20 @@ public class SidePanel {
         for(StatField statField : StatField.values()){
             this.statLabels.get(statField).setText(statField.toString() + map.getStats(statField));
         }
-        this.dominatingGenomeText.setText("Dominating genome: \n" + map.stats.getDominatingGenome());
+        this.dominatingGenomeText.setText("Dominating genome: " + map.stats.getDominatingGenome());
         displayStatisticOfAnimalBeingObserved();
     }
 
     public void displayStatisticOfAnimalBeingObserved(){
-        if(map.chosenAnimal == null) return;
+        if(!map.hasChosenAnimal()) return;
 
-        this.chosenAnimalGenomeText.setText("Genome: \n"+this.map.chosenAnimal.animal.getGenome());
-        this.chosenAnimalChildrenText.setText("Number of children: "+this.map.chosenAnimal.numOfChildren);
-        this.chosenAnimalSuccessorsText.setText("Number of successors: "+this.map.chosenAnimal.numOfSuccessors);
+        this.chosenAnimalText.setText("Chosen animal:");
+        this.chosenAnimalGenomeText.setText("Genome: "+this.map.getChosenAnimal().animal.getGenome());
+        this.chosenAnimalChildrenText.setText("Number of children: "+this.map.getChosenAnimal().numOfChildren);
+        this.chosenAnimalSuccessorsText.setText("Number of successors: "+this.map.getChosenAnimal().numOfSuccessors);
 
-        if(this.map.chosenAnimal.deathDate != -1)
-            this.chosenAnimalDeathDate.setText("Death date: "+this.map.chosenAnimal.deathDate);
+        if(this.map.getChosenAnimal().isDead())
+            this.chosenAnimalDeathDate.setText("Death date: "+this.map.getChosenAnimal().deathDate);
         else this.chosenAnimalDeathDate.setText("");
     }
 

@@ -30,7 +30,7 @@ public class MapPanel implements IButtonPressedObserver {
         this.panel = new JPanel();
         this.panel.setLayout(new GridLayout(this.map.getHeight(), this.map.getWidth(),0,0));
         this.panel.setSize(this.size.x, this.size.y);
-
+        this.panel.setBorder(BorderFactory.createEmptyBorder(2,2,2,2));
         for (int y = 0; y < map.getHeight(); y++) {
             for (int x = 0; x < map.getWidth(); x++) {
                 Vector2d position = new Vector2d(x, y);
@@ -41,7 +41,7 @@ public class MapPanel implements IButtonPressedObserver {
                         super.mouseClicked(e);
                         if(paused && map.animalsAt(position)!=null) {
                             Vector2d oldChosenPosition = null;
-                            if(map.chosenAnimal != null && !map.chosenAnimal.isDead()) oldChosenPosition = map.chosenAnimal.getPosition();
+                            if(map.hasChosenAnimal() && !map.getChosenAnimal().isDead()) oldChosenPosition = map.getChosenAnimal().getPosition();
                             map.chooseAnimal(position);
                             insertAnimal(position);
                             if(oldChosenPosition!= null) insertAnimal(oldChosenPosition);
@@ -80,7 +80,7 @@ public class MapPanel implements IButtonPressedObserver {
     public void insertAnimal(Vector2d position) {
         Animal animal = map.animalsAt(position).get(0);
         ImageIcon catIcon = this.mapIcons.getCatImage(animal.getEnergyLevel(), this.map.isInsideJungle(position));
-        if(this.map.chosenAnimal!=null && map.animalsAt(position).contains(this.map.chosenAnimal.animal))
+        if(this.map.hasChosenAnimal() && map.animalsAt(position).contains(this.map.getChosenAnimal().animal))
             catIcon = this.mapIcons.getTacImage(animal.getEnergyLevel());
         JLabel animalLabel = this.labels.get(position);
         animalLabel.setIcon(catIcon);
@@ -115,7 +115,7 @@ public class MapPanel implements IButtonPressedObserver {
 
                 Vector2d position = new Vector2d(x, y);
                 JLabel label = this.labels.get(position);
-                if(map.chosenAnimal != null && map.chosenAnimal.getPosition().equals(position) && map.chosenAnimal.isDead()){
+                if(map.hasChosenAnimal() && map.getChosenAnimal().getPosition().equals(position) && map.getChosenAnimal().isDead()){
                     this.insertTacGrave(position);
                 } else
                 if (map.animalsAt(position) != null) {

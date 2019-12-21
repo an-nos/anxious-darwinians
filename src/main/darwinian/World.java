@@ -1,11 +1,6 @@
 package darwinian;
 
-import javafx.animation.Animation;
-
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import java.io.IOException;
 import org.json.simple.JSONObject;
@@ -76,6 +71,5 @@ public class World {
 
     //TODO: Get top ever genome in statistics
     //TODO: THREADS?
-    //TODO: repair size of window
 
 }

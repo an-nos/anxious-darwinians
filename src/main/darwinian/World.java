@@ -48,23 +48,6 @@ public class World {
         FoldingMap map2 = null;
         if(secondMap) map2 = new FoldingMap(width, height, startEnergy, moveEnergy, plantEnergy, 0.1);
 
-//        for(int i=0; i<5; i++){
-//            Plant plant1 = new Plant(map1.randomPosition(), plantEnergy);
-//            map1.insertPlant(plant1);
-//            if(secondMap) {
-//                Plant plant2 = new Plant(map2.randomPosition(), plantEnergy);
-//                map2.insertPlant(plant2);
-//            }
-//        }
-//
-//        for(int i=0; i<40; i++){
-//            Plant plant1 = new Plant(map1.randomPositionInJungle(), plantEnergy);
-//            map1.insertPlant(plant1);
-//            if(secondMap) {
-//                Plant plant2 = new Plant(map2.randomPosition(), plantEnergy);
-//                map2.insertPlant(plant2);
-//            }
-//        }
 
         for(int i = 0; i<numOfAnimals; i++) {
             Animal nextCat1 = new Animal(startEnergy, startEnergy, moveEnergy, new Genome(), map1);
@@ -79,7 +62,7 @@ public class World {
         try {
             visualizerTest = new SwingVisualizer(map1, map2);
             while(true){
-                if(visualizerTest.sidePanel.pausePressed){
+                if(visualizerTest.pausePressed){
                     Thread.sleep(5);
                     continue;
                 }
@@ -95,8 +78,5 @@ public class World {
     //TODO: THREADS?
     //TODO: repair size of window
     //TODO: hashmap of free positions
-    /*
-    rip chosenAnimal, show that animal is chosen
-    maybe fast forward??? jump n days
-     */
+
 }

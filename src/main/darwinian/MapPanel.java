@@ -11,25 +11,25 @@ import java.util.List;
 
 public class MapPanel implements IButtonPressedObserver {
 
-    private Vector2d mapPanelSize;
+    private Vector2d size;
     private FoldingMap map;
     private MapIcons mapIcons;
     private Map<Vector2d, JLabel> labels;
-    JPanel mapPanel;
+    JPanel panel;
     private int speed;
     boolean paused = false;
 
     public MapPanel(Vector2d mainPanelSize, FoldingMap map, int speed) throws IOException {
         this.map = map;
-        this.mapPanelSize = mainPanelSize;
+        this.size = mainPanelSize;
         this.speed = speed;
-        this.mapIcons = new MapIcons(this.mapPanelSize.x / this.map.getWidth(), this.mapPanelSize.y / this.map.getHeight());
+        this.mapIcons = new MapIcons(this.size.x / this.map.getWidth(), this.size.y / this.map.getHeight());
 
         this.labels = new HashMap<>();
 
-        this.mapPanel = new JPanel();
-        this.mapPanel.setLayout(new GridLayout(this.map.getHeight(), this.map.getWidth(),0,0));
-        this.mapPanel.setSize(this.mapPanelSize.x, this.mapPanelSize.y);
+        this.panel = new JPanel();
+        this.panel.setLayout(new GridLayout(this.map.getHeight(), this.map.getWidth(),0,0));
+        this.panel.setSize(this.size.x, this.size.y);
 
         for (int y = 0; y < map.getHeight(); y++) {
             for (int x = 0; x < map.getWidth(); x++) {
@@ -48,7 +48,7 @@ public class MapPanel implements IButtonPressedObserver {
                         }
                     }
                 });
-                this.mapPanel.add(label);
+                this.panel.add(label);
                 labels.put(position, label);
                 if (map.animalsAt(position) != null) {
                     insertAnimal(position);
@@ -63,7 +63,7 @@ public class MapPanel implements IButtonPressedObserver {
 
     private JLabel createEmptyLabel() throws IOException {
         JLabel label = new JLabel();
-        label.setSize(this.mapPanelSize.x / this.map.getWidth(), this.mapPanelSize.y / this.map.getHeight());
+        label.setSize(this.size.x / this.map.getWidth(), this.size.y / this.map.getHeight());
         label.setText("");
         label.setOpaque(true);
         label.setForeground(Color.WHITE);
@@ -139,4 +139,5 @@ public class MapPanel implements IButtonPressedObserver {
     public void showDominatingPressed() {
         this.insertKindred(map.getSuperiorRace());
     }
+
 }

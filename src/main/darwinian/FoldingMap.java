@@ -51,6 +51,15 @@ public class FoldingMap implements IAnimalStateChangeObserver {
         this.mapStateChangeObservers  = new ArrayList<>();
         this.age = 0;
 
+        this.freePositionsInJungle = new ArrayList<>();
+        this.freePositionsOutsideJungle = new ArrayList<>();
+
+        for(int x = this.lowerBound.x; x <= this.upperBound.x; x++){
+            for(int y = this.lowerBound.y; y <= this.upperBound.y; y++){
+                addFreePosition(new Vector2d(x,y));
+            }
+        }
+
         this.chosenAnimal = null;
         this.stats = new MapStats(this);
 
@@ -80,7 +89,19 @@ public class FoldingMap implements IAnimalStateChangeObserver {
             return this.animalsByGenome.get(this.stats.getDominatingGenome());
     }
 
-    public void placeAnimal(Animal animal, Vector2d position){
+    private void addFreePosition(Vector2d position){
+        if(isOccupied(position)) return;
+        if(isInsideJungle(position)) this.freePositionsInJungle.add(position);
+        else this.freePositionsOutsideJungle.add(position);
+    }
+
+    private void removeFreePosition(Vector2d position){
+        if(!isOccupied(position)) return;
+        if(isInsideJungle(position)) this.freePositionsInJungle.remove(position);
+        else this.freePositionsOutsideJungle.remove(position);
+    }
+
+    private void placeAnimal(Animal animal, Vector2d position){
 
         List<Animal> animalsOnThisPosition = animalsAt(animal.getPosition());
 
@@ -88,6 +109,9 @@ public class FoldingMap implements IAnimalStateChangeObserver {
             List<Animal> newList = new ArrayList<>();
             newList.add(animal);
             this.animalsByPosition.put(position, newList);
+
+            this.removeFreePosition(position);
+
         }
         else{
             animalsOnThisPosition.add(animal);
@@ -97,18 +121,25 @@ public class FoldingMap implements IAnimalStateChangeObserver {
     public void removeAnimalFromPosition(Animal animal, Vector2d oldPosition){
         List<Animal> animalsOnThisPosition = animalsAt(oldPosition);
         animalsOnThisPosition.remove(animal);
-        if(animalsOnThisPosition.isEmpty()) this.animalsByPosition.remove(oldPosition);
+        if(animalsOnThisPosition.isEmpty()){
+            this.animalsByPosition.remove(oldPosition);
+            this.addFreePosition(oldPosition);
+        }
     }
 
     void insertPlant(Plant plant){
         if(this.plants.contains(plant)) return;
         this.plants.add(plant);
         this.plantsByPosition.put(plant.getPosition(),plant);
+        this.removeFreePosition(plant.getPosition());
     }
 
     private void removePlants(List<Plant> plantsToBeRemoved){
         this.plants.removeAll(plantsToBeRemoved);
-        for(Plant plant : plantsToBeRemoved) this.plantsByPosition.remove(plant.getPosition());
+        for(Plant plant : plantsToBeRemoved){
+            this.plantsByPosition.remove(plant.getPosition());
+            this.removeFreePosition(plant.getPosition());
+        }
     }
 
     public List<Animal> animalsAt(Vector2d position){
@@ -138,32 +169,24 @@ public class FoldingMap implements IAnimalStateChangeObserver {
     }
 
     Vector2d randomPosition(){
-        Vector2d result;
-        int area = this.getHeight()*this.getWidth();
-        int i = 0;
-        do{
-            Random randomGenerator = new Random();
-            int x = randomGenerator.nextInt(this.upperBound.x + 1);
-            int y = randomGenerator.nextInt(this.upperBound.y + 1);
-            result = new Vector2d(x, y);
-            i++;
-        }while(isOccupied(result) && i<area);
-        return result;
+        int randBound = this.freePositionsInJungle.size() + this.freePositionsOutsideJungle.size();
+
+        Random randomGenerator = new Random();
+        int randomNumber = randomGenerator.nextInt(randBound);
+
+        if(randomNumber < this.freePositionsInJungle.size()){
+            return this.freePositionsInJungle.get(randomNumber);
+        }
+        else return this.freePositionsOutsideJungle.get(randomNumber - this.freePositionsInJungle.size());
     }
 
-    Vector2d randomPositionInJungle(){
-        Vector2d result;
-        int jungleArea = this.getJungleHeight()*this.getJungleWidth();
-        int i=0;
-        do {
-            Random randomGenerator = new Random();
-            int x = randomGenerator.nextInt(this.jungleUpperBound.x - this.jungleLowerBound.x + 1);
-            int y = randomGenerator.nextInt(this.jungleUpperBound.y - this.jungleLowerBound.y + 1);
-            result = new Vector2d(this.jungleLowerBound.x + x, this.jungleLowerBound.y + y);
-            i++;
-        } while(isOccupied(result) && i<jungleArea);
-        return result;
+    Vector2d randomPositionOf(List<Vector2d> positions){
+        Random randomGenerator = new Random();
+        int randomIndex = randomGenerator.nextInt(positions.size());
+        return positions.get(randomIndex);
     }
+
+
 
     public boolean isOccupied(Vector2d position){
         if(this.animalsByPosition.get(position) == null){
@@ -210,7 +233,7 @@ public class FoldingMap implements IAnimalStateChangeObserver {
         this.dead.add(animal);
         this.stats.updateDeadCount(animal.getAge());
         this.stats.decreaseGenomeCounter(animal.getGenome());
-        this.animalsByGenome.remove(animal);
+        this.removeAnimalByGenome(animal);
     }
 
     void corpseSweeper(){
@@ -249,37 +272,24 @@ public class FoldingMap implements IAnimalStateChangeObserver {
                 else break;
             }
         }
-        removePlants(plantsToBeEaten);
-        plantsToBeEaten.clear();
+        removePlants(this.plantsToBeEaten);
+        this.plantsToBeEaten.clear();
     }
 
     private void growNewPlants(){
-        int jungleArea = this.getJungleHeight()*this.getJungleWidth();
-        int i = 0;
-        Vector2d positionInsideJungle;
+//        int jungleArea = this.getJungleHeight()*this.getJungleWidth();
+//        int i = 0;
 
-        do{
-            positionInsideJungle = this.randomPositionInJungle();
-            i++;
-        }while(this.isOccupied(positionInsideJungle) && i<jungleArea);
-
-        if(!this.isOccupied(positionInsideJungle)) {
-            Plant junglePlant = new Plant(positionInsideJungle, this.plantEnergy);
-            this.insertPlant(junglePlant);
+        if(!this.freePositionsInJungle.isEmpty()) {
+            Vector2d positionInsideJungle = this.randomPositionOf(freePositionsInJungle);
+            this.insertPlant(new Plant(positionInsideJungle, this.plantEnergy));
         }
 
-        Vector2d positionOutsideJungle;
-        i = 0;
-        int areaWithoutJungle = this.getHeight()*this.getWidth() - jungleArea;
-        do{
-            positionOutsideJungle = this.randomPosition();
-            i++;
-        } while((this.isInsideJungle(positionOutsideJungle) && this.isOccupied(positionOutsideJungle) && i<areaWithoutJungle));
-
-        if(!this.isOccupied(positionOutsideJungle)){
-            Plant firstPlant = new Plant(positionOutsideJungle, this.plantEnergy);
-            this.insertPlant(firstPlant);
+        if(!freePositionsOutsideJungle.isEmpty()) {
+            Vector2d positionOutsideJungle = this.randomPositionOf(this.freePositionsOutsideJungle);
+            this.insertPlant(new Plant(positionOutsideJungle, this.plantEnergy));
         }
+
     }
 
     private void mating(){

@@ -84,7 +84,7 @@ public class SwingVisualizer implements IMapStateChangeObserver {
 
     }
 
-    public boolean isPaused(){ return this.pausePressed;}
+    boolean isPaused(){ return this.pausePressed;}
 
     private List<JButton> createButtonList(){
         List<JButton> buttonList = new ArrayList<>();

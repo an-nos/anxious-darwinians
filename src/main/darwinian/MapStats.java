@@ -8,11 +8,10 @@ import java.util.Map;
 public class MapStats {
 
     private FoldingMap map;
-    private int lifeSpanSum;
-    private int deadCount;
-    private int childrenCount;
+    private int lifeSpanSum, deadCount, childrenCount;
+
     private Genome dominatingGenome, everDominatingGenome;
-    int everDominatingGenomeCount;
+    private int everDominatingGenomeCount;
     private Map<Genome, Integer> genomeCount;
 
     private Map<StatField, Integer> stats;
@@ -34,21 +33,21 @@ public class MapStats {
         }
     }
 
-    public Genome getDominatingGenome(){
+    Genome getDominatingGenome(){
         return this.dominatingGenome;
     }
 
-    public void updateGenomeCounter(Genome genome){
+    void updateGenomeCounter(Genome genome){
         if(this.genomeCount.containsKey(genome)) this.genomeCount.put(genome, this.genomeCount.get(genome)+1);
         else this.genomeCount.put(genome, 1);
     }
 
-    public void decreaseGenomeCounter(Genome genome){
+    void decreaseGenomeCounter(Genome genome){
         if(this.genomeCount.get(genome).equals(1)) this.genomeCount.remove(genome);
         else this.genomeCount.put(genome, this.genomeCount.get(genome)-1);
     }
 
-    public void setDominatingGenome(){
+    private void setDominatingGenome(){
         int maxOccurrences = 0;
         Genome maxGenome = null;
 
@@ -68,12 +67,12 @@ public class MapStats {
         }
     }
 
-    public void updateDeadCount(int age){
+    void updateDeadCount(int age){
         this.lifeSpanSum += age;
         this.deadCount++;
     }
 
-    public void updateChildrenCount(){ this.childrenCount++; }
+    void updateChildrenCount(){ this.childrenCount++; }
 
     private void setCurrentAnimalCount() {
         StatField numOfAnimals = StatField.NUM_OF_ANIMALS;
@@ -120,12 +119,14 @@ public class MapStats {
         }
     }
 
-    public String getStats(StatField field){
+    String getStats(StatField field){
         return this.stats.get(field).toString();
     }
 
-    public List<String> getAvgStats(){
+    List<String> getAvgStats(){
+
         List<String> avgStats = new ArrayList<>();
+
         for(StatField stat : StatField.values()){
             if(stat.equals(StatField.DAY)) continue;
             StringBuilder line = new StringBuilder();
@@ -133,8 +134,10 @@ public class MapStats {
             line.append(this.totals.get(stat)/this.stats.get(StatField.DAY));
             avgStats.add(line.toString());
         }
+
         avgStats.add("Ever dominating genome: "+this.everDominatingGenome);
         avgStats.add("Highest number of animals with ever dominating genome: "+this.everDominatingGenomeCount);
+
         return avgStats;
     }
 

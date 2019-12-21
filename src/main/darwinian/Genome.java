@@ -11,8 +11,8 @@ public class Genome {
 
     List<Integer> genes;
     Integer[] presentGenes;
-    public static int numOfGenes = 32;
-    public static int numOfDiffGenes = 8;
+    public static final int numOfGenes = 32;
+    public static final int numOfDiffGenes = 8;
 
 
     public Genome (Genome fromMother, Genome fromFather){

@@ -141,17 +141,17 @@ public class FoldingMap implements IAnimalStateChangeObserver {
         }
     }
 
-    public List<Animal> animalsAt(Vector2d position){
+    List<Animal> animalsAt(Vector2d position){
         return this.animalsByPosition.get(position);
     }
 
-    public Plant plantAt(Vector2d position){ return plantsByPosition.get(position); }
+    Plant plantAt(Vector2d position){ return plantsByPosition.get(position); }
 
-    public boolean isInsideJungle(Vector2d position){ return position.follows(this.jungleLowerBound) && position.precedes(this.jungleUpperBound); }
+    boolean isInsideJungle(Vector2d position){ return position.follows(this.jungleLowerBound) && position.precedes(this.jungleUpperBound); }
 
-    public boolean allowedPosition(Vector2d position){ return position.follows(this.lowerBound) && position.precedes(this.upperBound); }
+    private boolean allowedPosition(Vector2d position){ return position.follows(this.lowerBound) && position.precedes(this.upperBound); }
 
-    public Vector2d convertToAllowedPosition(Vector2d position){
+    Vector2d convertToAllowedPosition(Vector2d position){
 
         if(allowedPosition(position)) return position;
 
@@ -185,7 +185,7 @@ public class FoldingMap implements IAnimalStateChangeObserver {
         return positions.get(randomIndex);
     }
 
-    public boolean isOccupied(Vector2d position){
+    boolean isOccupied(Vector2d position){
         if(this.animalsByPosition.get(position) == null){
             return this.plantsByPosition.get(position) != null;
         }
@@ -260,7 +260,7 @@ public class FoldingMap implements IAnimalStateChangeObserver {
                 }
             }
 
-            int energyForEach = plant.energy/=numOfEquals;
+            int energyForEach = plant.getEnergy() / numOfEquals;
 
             for(Animal animal: competingAnimals){
                 if(animal.getEnergy() == maxEnergy) {
@@ -329,11 +329,11 @@ public class FoldingMap implements IAnimalStateChangeObserver {
         for(IMapStateChangeObserver observer : this.mapStateChangeObservers) observer.onDayEnd();
     }
 
-    public boolean hasChosenAnimal(){
+    boolean hasChosenAnimal(){
         return this.chosenAnimal != null;
     }
 
-    public void chooseAnimal(Vector2d position){
+    void chooseAnimal(Vector2d position){
         this.chosenAnimal = new ChosenAnimal(this.getTopAnimalAt(position), this.age);
         for(IMapStateChangeObserver observer : this.mapStateChangeObservers) observer.onAnimalChosen(this);
     }

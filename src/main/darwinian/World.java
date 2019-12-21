@@ -7,7 +7,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-
 public class World {
 
     public static void main(String[] args) throws FileNotFoundException {
@@ -33,9 +32,7 @@ public class World {
             numOfAnimals = (int) (long)jsonObject.get("numOfAnimals");
             secondMap = (boolean) jsonObject.get("secondMap");
 
-        } catch (ParseException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (ParseException | IOException e) {
             e.printStackTrace();
         }
 

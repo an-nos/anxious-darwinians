@@ -1,7 +1,5 @@
 package darwinian;
 
-import javax.swing.*;
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 
@@ -28,9 +26,9 @@ public class Animal implements Comparable {
         this.isSuccessor = false;
     }
 
-    public Integer getEnergy(){ return this.energy; }
+    Integer getEnergy(){ return this.energy; }
 
-    public Integer getEnergyLevel(){
+    Integer getEnergyLevel(){
         double relativeEnergy = (double)this.energy / (double)this.startEnergy;
 
         if(relativeEnergy <= 0.25) return 1;
@@ -44,11 +42,11 @@ public class Animal implements Comparable {
 
     }
 
-    public Genome getGenome(){ return this.genome; }
+    Genome getGenome(){ return this.genome; }
 
-    public int getAge(){ return this.map.getAge() - this.birthDate; }
+    int getAge(){ return this.map.getAge() - this.birthDate; }
 
-    public Vector2d getPosition(){ return this.position; }
+    Vector2d getPosition(){ return this.position; }
 
     private void changeDirection (){
         Random randomGenerator = new Random();
@@ -56,7 +54,7 @@ public class Animal implements Comparable {
         this.direction = this.direction.fromInt((chosenDirection + this.direction.toInt())%8);
     }
 
-    public void move (){
+    void move(){
 
         if(this.energy-this.moveEnergy>0) {
 
@@ -72,13 +70,13 @@ public class Animal implements Comparable {
         else this.die();
     }
 
-    public void eat(int energy){
+    void eat(int energy){
         this.energy += energy;
     }
 
-    public boolean canMate (){ return this.energy * 2 >= this.startEnergy; }
+    boolean canMate(){ return this.energy * 2 >= this.startEnergy; }
 
-    public Animal mate(Animal other){
+    Animal mate(Animal other){
         if(this.canMate() && other.canMate()){
 
             List<Vector2d> positionsNearParents = new ArrayList<>();
@@ -114,27 +112,27 @@ public class Animal implements Comparable {
 
     }
 
-    public void addObserver(IAnimalStateChangeObserver observer){
+    void addObserver(IAnimalStateChangeObserver observer){
         observers.add(observer);
     }
 
-    public void removeObserver(IAnimalStateChangeObserver observer){
+    void removeObserver(IAnimalStateChangeObserver observer){
         observers.remove(observer);
     }
 
-    public void giveBirthTo(Animal child){
+    private void giveBirthTo(Animal child){
         for(IAnimalStateChangeObserver observer: observers){
             observer.animalBorn(child);
         }
     }
 
-    public void positionChanged(Animal animal, Vector2d oldPosition){
+    private void positionChanged(Animal animal, Vector2d oldPosition){
         for(IAnimalStateChangeObserver observer: observers){
             observer.positionChanged(animal, oldPosition);
         }
     }
 
-    public void die(){
+    private void die(){
         for(IAnimalStateChangeObserver observer: observers) observer.animalDied(this);
     }
 

@@ -41,22 +41,24 @@ public class MapPanel implements IButtonPressedObserver {
                         super.mouseClicked(e);
                         if(paused && map.animalsAt(position)!=null) {
                             Vector2d oldChosenPosition = null;
-                            if(map.hasChosenAnimal() && !map.getChosenAnimal().isDead()) oldChosenPosition = map.getChosenAnimal().getPosition();
+                            if(map.hasChosenAnimal()) oldChosenPosition = map.getChosenAnimal().getPosition();
                             map.chooseAnimal(position);
                             insertAnimal(position);
-                            if(oldChosenPosition!= null) insertAnimal(oldChosenPosition);
+                            if(oldChosenPosition!= null){
+                                if(map.animalsAt(oldChosenPosition) != null) insertAnimal(oldChosenPosition);
+                                else if(map.plantAt(oldChosenPosition) != null) insertPlant(oldChosenPosition);
+                                else emptyLabel(oldChosenPosition);
+                            }
                         }
                     }
                 });
+
                 this.panel.add(label);
                 labels.put(position, label);
-                if (map.animalsAt(position) != null) {
-                    insertAnimal(position);
-                } else if (map.plantAt(position) != null) {
-                    insertPlant(position);
-                } else {
-                    emptyLabel(label, position);
-                }
+
+                if (map.animalsAt(position) != null) insertAnimal(position);
+                else if (map.plantAt(position) != null) insertPlant(position);
+                else emptyLabel(position);
             }
         }
     }
@@ -71,13 +73,14 @@ public class MapPanel implements IButtonPressedObserver {
         return label;
     }
 
-    private void emptyLabel(JLabel label, Vector2d position) {
+    private void emptyLabel(Vector2d position) {
+        JLabel label = this.labels.get(position);
         if (this.map.isInsideJungle(position)) label.setIcon(this.mapIcons.getJungleIcon());
         else label.setIcon(this.mapIcons.getBackgroundIcon());
         label.setText("");
     }
 
-    public void insertAnimal(Vector2d position) {
+    private void insertAnimal(Vector2d position) {
         Animal animal = map.animalsAt(position).get(0);
         ImageIcon catIcon = this.mapIcons.getCatImage(animal.getEnergyLevel(), this.map.isInsideJungle(position));
         if(this.map.hasChosenAnimal() && map.animalsAt(position).contains(this.map.getChosenAnimal().animal))
@@ -86,24 +89,24 @@ public class MapPanel implements IButtonPressedObserver {
         animalLabel.setIcon(catIcon);
     }
 
-    public void insertPlant(Vector2d position) {
+    private void insertPlant(Vector2d position) {
         JLabel plantLabel = this.labels.get(position);
         if (this.map.isInsideJungle(position)) plantLabel.setIcon(this.mapIcons.getPlantInJungleIcon());
         else plantLabel.setIcon(this.mapIcons.getPlantIcon());
         plantLabel.setText("");
     }
 
-    public void insertTacGrave(Vector2d position){
+    private void insertTacGrave(Vector2d position){
         this.labels.get(position).setIcon(this.mapIcons.getTacGraveIcon());
     }
 
-    public void insertKindred(List<Animal> kindred){
+    private void insertKindred(List<Animal> kindred){
         for(Animal animal : kindred){
             this.labels.get(animal.getPosition()).setIcon(this.mapIcons.getKindredIcon());
         }
     }
 
-    public void renderMap() {
+    void renderMap() {
         try {
             Thread.sleep(delay);
         } catch (InterruptedException e) {
@@ -114,7 +117,7 @@ public class MapPanel implements IButtonPressedObserver {
             for (int x = 0; x < map.getWidth(); x++) {
 
                 Vector2d position = new Vector2d(x, y);
-                JLabel label = this.labels.get(position);
+
                 if(map.hasChosenAnimal() && map.getChosenAnimal().getPosition().equals(position) && map.getChosenAnimal().isDead()){
                     this.insertTacGrave(position);
                 } else
@@ -123,12 +126,13 @@ public class MapPanel implements IButtonPressedObserver {
                 } else if (map.plantAt(position) != null) {
                     this.insertPlant(position);
                 } else {
-                    this.emptyLabel(label, position);
+                    this.emptyLabel(position);
                 }
             }
         }
     }
 
+    @Override
     public void changeDelay(int newDelay){
         this.delay = newDelay;
     }

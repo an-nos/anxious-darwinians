@@ -17,11 +17,11 @@ public class ChosenAnimal {
         this.deathDate = -1;
     }
 
-    public boolean isDead(){
+    boolean isDead(){
         return this.deathDate != -1;
     }
 
-    public Vector2d getPosition(){
+    Vector2d getPosition(){
         return this.animal.getPosition();
     }
 

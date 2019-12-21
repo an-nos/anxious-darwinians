@@ -26,17 +26,17 @@ public class MapIcons {
         this.tacIcons = new ArrayList<>();
 
         for(int i=1; i<=8; i++){
-            this.catIcons.add(getScaledIcon(ImageIO.read(new File("src\\main\\resources\\cat"+i+".png"))));
-            this.catInJungleIcons.add(getScaledIcon(ImageIO.read(new File("src\\main\\resources\\catInJungle"+i+".png"))));
-            this.tacIcons.add(getScaledIcon(ImageIO.read(new File("src\\main\\resources\\tac"+i+".png"))));
+            this.catIcons.add(getScaledIcon(ImageIO.read(new File("src\\main\\resources\\img\\cat"+i+".png"))));
+            this.catInJungleIcons.add(getScaledIcon(ImageIO.read(new File("src\\main\\resources\\img\\catInJungle"+i+".png"))));
+            this.tacIcons.add(getScaledIcon(ImageIO.read(new File("src\\main\\resources\\img\\tac"+i+".png"))));
         }
 
-        this.plantIcon = getScaledIcon(ImageIO.read(new File("src\\main\\resources\\toast.png")));
-        this.backgroundIcon = getScaledIcon(ImageIO.read(new File("src\\main\\resources\\background.png")));
-        this.jungleIcon = getScaledIcon(ImageIO.read(new File("src\\main\\resources\\jungleBackground.png")));
-        this.plantInJungleIcon = getScaledIcon(ImageIO.read(new File("src\\main\\resources\\toastInJungle.png")));
-        this.tacGraveIcon = getScaledIcon(ImageIO.read(new File("src\\main\\resources\\tombstone.png")));
-        this.kindredIcon = getScaledIcon(ImageIO.read(new File("src\\main\\resources\\kindred.png")));
+        this.plantIcon = getScaledIcon(ImageIO.read(new File("src\\main\\resources\\img\\toast.png")));
+        this.backgroundIcon = getScaledIcon(ImageIO.read(new File("src\\main\\resources\\img\\background.png")));
+        this.jungleIcon = getScaledIcon(ImageIO.read(new File("src\\main\\resources\\img\\jungleBackground.png")));
+        this.plantInJungleIcon = getScaledIcon(ImageIO.read(new File("src\\main\\resources\\img\\toastInJungle.png")));
+        this.tacGraveIcon = getScaledIcon(ImageIO.read(new File("src\\main\\resources\\img\\tombstone.png")));
+        this.kindredIcon = getScaledIcon(ImageIO.read(new File("src\\main\\resources\\img\\kindred.png")));
     }
 
 

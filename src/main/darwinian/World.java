@@ -18,6 +18,7 @@ public class World {
         int plantEnergy = 50;
         int numOfAnimals = 100;
         boolean secondMap = true;
+        double jungleRatio = 0.1;
 
         JSONParser jsonParser = new JSONParser();
 
@@ -31,14 +32,15 @@ public class World {
             plantEnergy = (int) (long) jsonObject.get("plantEnergy");
             numOfAnimals = (int) (long)jsonObject.get("numOfAnimals");
             secondMap = (boolean) jsonObject.get("secondMap");
+            jungleRatio = (double) jsonObject.get("jungleRatio");
 
         } catch (ParseException | IOException e) {
             e.printStackTrace();
         }
 
-        FoldingMap map1 = new FoldingMap(width, height, startEnergy, moveEnergy, plantEnergy, 0.1);
+        FoldingMap map1 = new FoldingMap(width, height, startEnergy, moveEnergy, plantEnergy, jungleRatio);
         FoldingMap map2 = null;
-        if(secondMap) map2 = new FoldingMap(width, height, startEnergy, moveEnergy, plantEnergy, 0.1);
+        if(secondMap) map2 = new FoldingMap(width, height, startEnergy, moveEnergy, plantEnergy, jungleRatio);
 
 
         for(int i = 0; i<numOfAnimals; i++) {

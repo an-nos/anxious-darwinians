@@ -30,16 +30,7 @@ public class Animal implements Comparable {
 
     Integer getEnergyLevel(){
         double relativeEnergy = (double)this.energy / (double)this.startEnergy;
-
-        if(relativeEnergy <= 0.25) return 1;
-        if(relativeEnergy <= 0.5) return 2;
-        if(relativeEnergy <= 0.75) return 3;
-        if(relativeEnergy <= 1) return 4;
-        if(relativeEnergy <= 1.25) return 5;
-        if(relativeEnergy <= 1.5) return 6;
-        if(relativeEnergy <= 1.75) return 7;
-        return 8;
-
+        return (int) Math.min(Math.ceil(relativeEnergy * 4), 8);
     }
 
     Genome getGenome(){ return this.genome; }

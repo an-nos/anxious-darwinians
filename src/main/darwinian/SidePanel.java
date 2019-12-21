@@ -13,11 +13,10 @@ public class SidePanel {
     private Vector2d size;
     public FoldingMap map;
 
-    private JLabel chosenAnimalText;
-    private JLabel dominatingGenomeText, chosenAnimalChildrenText, chosenAnimalSuccessorsText, chosenAnimalDeathDate, chosenAnimalGenomeText;
+    private JLabel chosenAnimalText, chosenAnimalChildrenText, chosenAnimalSuccessorsText, chosenAnimalDeathDate, chosenAnimalGenomeText;
+    private JLabel dominatingGenomeText;
 
     private Map<StatField, JLabel> statLabels;
-
 
     public SidePanel(Vector2d size, FoldingMap map, List<JButton> buttonList){
 
@@ -65,7 +64,6 @@ public class SidePanel {
         this.chosenAnimalDeathDate = addTextLabel("");
 
     }
-
 
     JLabel addTextLabel(String initialText){
         JLabel textLabel = new JLabel();

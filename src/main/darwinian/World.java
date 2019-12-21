@@ -11,6 +11,7 @@ import org.json.simple.parser.ParseException;
 public class World {
 
     public static void main(String[] args) throws FileNotFoundException {
+
         int width = 50;
         int height = 50;
         int startEnergy = 50;
@@ -23,7 +24,7 @@ public class World {
 
         try{
 
-            JSONObject jsonObject = (JSONObject) jsonParser.parse(new FileReader("src\\main\\darwinian\\parameters.json"));
+            JSONObject jsonObject = (JSONObject) jsonParser.parse(new FileReader("src\\main\\resources\\parameters.json"));
             width =  (int) (long) jsonObject.get("width");
             height = (int) (long) jsonObject.get("height");
             startEnergy = (int) (long) jsonObject.get("startEnergy");
@@ -38,26 +39,22 @@ public class World {
             e.printStackTrace();
         }
 
-
         FoldingMap map1 = new FoldingMap(width, height, startEnergy, moveEnergy, plantEnergy, 0.1);
         FoldingMap map2 = null;
         if(secondMap) map2 = new FoldingMap(width, height, startEnergy, moveEnergy, plantEnergy, 0.1);
 
 
         for(int i = 0; i<numOfAnimals; i++) {
-            Animal nextCat1 = new Animal(startEnergy, startEnergy, moveEnergy, new Genome(), map1);
-            map1.animalBorn(nextCat1);
-            if(secondMap) {
-                Animal nextCat2 = new Animal(startEnergy, startEnergy, moveEnergy, new Genome(), map2);
-                map2.animalBorn(nextCat2);
-            }
+            Animal cat = new Animal(startEnergy, startEnergy, moveEnergy, new Genome(), map1);
+            map1.animalBorn(cat);
+            if(secondMap) map2.animalBorn(cat);
         }
 
         SwingVisualizer swingVisualizer = null;
         try {
             swingVisualizer = new SwingVisualizer(map1, map2);
             while(true){
-                if(swingVisualizer.pausePressed){
+                if(swingVisualizer.isPaused()){
                     Thread.sleep(5);
                     continue;
                 }

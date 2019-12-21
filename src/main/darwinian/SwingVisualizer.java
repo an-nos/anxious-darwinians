@@ -16,77 +16,75 @@ public class SwingVisualizer implements IMapStateChangeObserver {
     private FoldingMap map;
     private FoldingMap secondMap;
 
-    private JFrame frame;
-    private Vector2d mapPanelSize, sidePanelSize;
-    private Vector2d frameSize;
     private SidePanel sidePanel, secondSidePanel;
     private MapPanel mapPanel;
     private MapPanel secondMapPanel;
-    private JPanel statsPanel;
-    private int speed;
-    boolean pausePressed;
+    private boolean pausePressed;
 
     private JButton pauseButton, showDominatingButton, saveButton;
 
     private List<IButtonPressedObserver> observers;
-
-
 
     public SwingVisualizer(FoldingMap map, FoldingMap secondMap) throws IOException {
         this.map = map;
         this.secondMap = secondMap;
         this.observers = new ArrayList<>();
 
-        this.statsPanel = new JPanel();
-        this.statsPanel.setLayout(new BoxLayout(this.statsPanel, BoxLayout.Y_AXIS));
+        JPanel statsPanel = new JPanel();
+        statsPanel.setLayout(new BoxLayout(statsPanel, BoxLayout.Y_AXIS));
+
+        Vector2d mapPanelSize;
+        Vector2d sidePanelSize;
+        Vector2d frameSize;
 
         if(this.secondMap == null){
-            this.mapPanelSize = new Vector2d(600, 600);
-            this.sidePanelSize = new Vector2d(430, 600);
-            this.frameSize = new Vector2d(this.mapPanelSize.x+this.sidePanelSize.x, this.mapPanelSize.y+40);
+            mapPanelSize = new Vector2d(600, 600);
+            sidePanelSize = new Vector2d(430, 600);
+            frameSize = new Vector2d(mapPanelSize.x+ sidePanelSize.x, mapPanelSize.y+40);
         }
         else{
-            this.mapPanelSize = new Vector2d(400, 400);
-            this.sidePanelSize = new Vector2d( 400, 350);
-            this.frameSize = new Vector2d(this.mapPanelSize.x*2+24, this.mapPanelSize.y+this.sidePanelSize.y);
+            mapPanelSize = new Vector2d(400, 400);
+            sidePanelSize = new Vector2d( 400, 350);
+            frameSize = new Vector2d(mapPanelSize.x*2+24, mapPanelSize.y+ sidePanelSize.y);
         }
 
-        this.speed = 10;
-        if(secondMap != null) this.speed/=2;
+        int speed = 10;
+        if(secondMap != null) speed /=2;
         this.map.addMapStateChangeObserver(this);
-        this.mapPanel = new MapPanel(this.mapPanelSize, this.map, this.speed);
+        this.mapPanel = new MapPanel(mapPanelSize, this.map, speed);
 
 
-        this.frame = new JFrame("Evolution");
-        this.frame.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        this.sidePanel = new SidePanel(this.sidePanelSize, this.map, this.createButtonList());
+        JFrame frame = new JFrame("Evolution");
+        frame.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        this.sidePanel = new SidePanel(sidePanelSize, this.map, this.createButtonList());
         this.addObserver(this.mapPanel);
 
-        this.frame.add(this.mapPanel.panel);
+        frame.add(this.mapPanel.panel);
 
         if(this.secondMap != null){
 
             this.secondMap.addMapStateChangeObserver(this);
-            this.secondMapPanel = new MapPanel(this.mapPanelSize, this.secondMap, this.speed);
+            this.secondMapPanel = new MapPanel(mapPanelSize, this.secondMap, speed);
 
-            this.secondSidePanel = new SidePanel(this.sidePanelSize, this.secondMap, null);
-            this.frame.add(this.secondMapPanel.panel);
+            this.secondSidePanel = new SidePanel(sidePanelSize, this.secondMap, null);
+            frame.add(this.secondMapPanel.panel);
 
             this.addObserver(this.secondMapPanel);
         }
 
-        this.frame.add(this.sidePanel.panel);
+        frame.add(this.sidePanel.panel);
         if(this.secondMap != null)
-        this.frame.add(this.secondSidePanel.panel);
+        frame.add(this.secondSidePanel.panel);
 
+        this.insertSpeedSlider();
 
-        this.frame.setSize(this.frameSize.x, this.frameSize.y);
-        this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.frame.setVisible(true);
-
-        insertSpeedSlider();
+        frame.setSize(frameSize.x, frameSize.y);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
 
     }
+
+    public boolean isPaused(){ return this.pausePressed;}
 
     private List<JButton> createButtonList(){
         List<JButton> buttonList = new ArrayList<>();
@@ -162,6 +160,7 @@ public class SwingVisualizer implements IMapStateChangeObserver {
             }
         }
     }
+
     private void writeStatsIn(JTextArea textArea){
         textArea.append("Following statistics are average values after "+ map.getAge()+" days\n");
         if(secondMap!=null) textArea.append("\nFirst map:\n");
@@ -171,14 +170,12 @@ public class SwingVisualizer implements IMapStateChangeObserver {
         textArea.append("\nSecond map:\n");
         for(String statStr: this.secondMap.stats.getAvgStats())
             textArea.append(statStr+"\n");
-
     }
 
     private void insertSpeedSlider(){
-        JSlider speedSlider = new JSlider(JSlider.HORIZONTAL,
-                0, 200, 20);
+        JSlider speedSlider = new JSlider(JSlider.HORIZONTAL, 0, 200, 20);
         speedSlider.setSize(200, 10);
-        speedSlider.addChangeListener(e -> changeDelay(e));
+        speedSlider.addChangeListener(this::changeDelay);
         speedSlider.setMajorTickSpacing(40);
         speedSlider.setMinorTickSpacing(10);
         this.sidePanel.addTextLabel("Change delay:");

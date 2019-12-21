@@ -72,8 +72,8 @@ public class MapPanel implements IButtonPressedObserver {
     }
 
     private void emptyLabel(JLabel label, Vector2d position) {
-        if (this.map.isInsideJungle(position)) label.setIcon(this.mapIcons.jungleIcon);
-        else label.setIcon(this.mapIcons.backgroundIcon);
+        if (this.map.isInsideJungle(position)) label.setIcon(this.mapIcons.getJungleIcon());
+        else label.setIcon(this.mapIcons.getBackgroundIcon());
         label.setText("");
     }
 
@@ -88,8 +88,8 @@ public class MapPanel implements IButtonPressedObserver {
 
     public void insertPlant(Vector2d position) {
         JLabel plantLabel = this.labels.get(position);
-        if (this.map.isInsideJungle(position)) plantLabel.setIcon(this.mapIcons.plantInJungleIcon);
-        else plantLabel.setIcon(this.mapIcons.plantIcon);
+        if (this.map.isInsideJungle(position)) plantLabel.setIcon(this.mapIcons.getPlantInJungleIcon());
+        else plantLabel.setIcon(this.mapIcons.getPlantIcon());
         plantLabel.setText("");
     }
 

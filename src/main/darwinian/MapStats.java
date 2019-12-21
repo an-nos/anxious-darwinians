@@ -1,6 +1,8 @@
 package darwinian;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MapStats {
@@ -9,8 +11,9 @@ public class MapStats {
     private int lifeSpanSum;
     private int deadCount;
     private int childrenCount;
-    public Genome dominatingGenome;
+    private Genome dominatingGenome;
     private Map<Genome, Integer> genomeCount;
+
 
     private Map<StatField, Integer> stats;
     private Map<StatField, Long> totals;
@@ -28,6 +31,10 @@ public class MapStats {
             this.stats.put(stat, 0);
             this.totals.put(stat, (long) 0);
         }
+    }
+
+    public Genome getDominatingGenome(){
+        return this.dominatingGenome;
     }
 
     public void updateGenomeCounter(Genome genome){
@@ -109,6 +116,18 @@ public class MapStats {
 
     public String getStats(StatField field){
         return this.stats.get(field).toString();
+    }
+
+    public List<String> getAvgStats(){
+        List<String> avgStats = new ArrayList<>();
+        for(StatField stat : StatField.values()){
+            if(stat.equals(StatField.DAY)) continue;
+            StringBuilder line = new StringBuilder();
+            line.append(stat);
+            line.append(this.totals.get(stat)/this.stats.get(StatField.DAY));
+            avgStats.add(line.toString());
+        }
+        return avgStats;
     }
 
     public void updateAllStats() {

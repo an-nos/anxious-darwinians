@@ -57,7 +57,6 @@ public class FoldingMap implements IAnimalStateChangeObserver {
     }
 
     public String getStats(StatField field){
-//        this.stats.updateAllStats();
         return this.stats.getStats(field);
     }
 
@@ -78,7 +77,7 @@ public class FoldingMap implements IAnimalStateChangeObserver {
     public Animal getTopAnimalAt(Vector2d position){ return (Animal) Collections.min(this.animalsAt(position)); }
 
     public List<Animal> getSuperiorRace(){
-            return this.animalsByGenome.get(this.stats.dominatingGenome);
+            return this.animalsByGenome.get(this.stats.getDominatingGenome());
     }
 
     public void placeAnimal(Animal animal, Vector2d position){

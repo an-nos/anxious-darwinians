@@ -1,20 +1,27 @@
 package darwinian;
 
+import org.w3c.dom.Text;
+
 import javax.swing.*;
+import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
+import java.util.zip.CheckedOutputStream;
 
 public class SidePanel implements ActionListener {
 
     public JPanel sidePanel;
 
     private Vector2d size;
-    private JButton pauseButton, showDominatingButton;
+    private JButton pauseButton, showDominatingButton, saveButton;
     public boolean pausePressed;
     public FoldingMap map;
 
@@ -44,10 +51,14 @@ public class SidePanel implements ActionListener {
             this.sidePanel.add(this.pauseButton);
 
             this.showDominatingButton = new JButton("show dominating");
-            this.showDominatingButton.addActionListener(this);
+            this.showDominatingButton.addActionListener(e -> showDominating());
             this.sidePanel.add(this.showDominatingButton);
-        }
 
+            this.saveButton = new JButton("save");
+            this.saveButton.addActionListener(e -> saveToFile());
+            this.sidePanel.add(this.saveButton);
+
+        }
 
         this.map = map;
         this.labels = new HashMap<>();
@@ -69,11 +80,6 @@ public class SidePanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
         String command = actionEvent.getActionCommand();
-
-        if(command.equals("show dominating") && this.pausePressed){
-            for(IButtonPressedObserver observer : this.observers) observer.showDominatingPressed();
-        }
-        else{
             if (command.equals("pause")) {
                 this.pausePressed = true;
                 this.pauseButton.setText("continue");
@@ -82,9 +88,39 @@ public class SidePanel implements ActionListener {
                 this.pauseButton.setText("pause");
             }
             for (IButtonPressedObserver observer : this.observers) observer.pausePressed();
-        }
-
     }
+
+    private void showDominating(){
+        if(this.pausePressed) for(IButtonPressedObserver observer : this.observers) observer.showDominatingPressed();
+    }
+
+    private void saveToFile(){
+        if(!pausePressed) return;
+        JFileChooser fileChooser = new JFileChooser();
+        int retval = fileChooser.showSaveDialog(this.saveButton);
+        if (retval == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            if (file == null) return;
+            if (!((File) file).getName().toLowerCase().endsWith(".txt"))
+                file = new File(file.getParentFile(), file.getName() + ".txt");
+            try {
+                JTextArea textArea = new JTextArea(24, 80);
+                writeStatsIn(textArea);
+                textArea.write(new OutputStreamWriter(new FileOutputStream(file),
+                        "utf-8"));
+                Desktop.getDesktop().open(file);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void writeStatsIn(JTextArea textArea){
+        textArea.append("Following statistics are average values after "+ map.getAge()+" days\n");
+        for(String statStr: this.map.stats.getAvgStats())
+            textArea.append(statStr+"\n");
+    }
+
 
     JLabel addTextLabel(String initialText){
         JLabel textLabel = new JLabel();
@@ -99,7 +135,7 @@ public class SidePanel implements ActionListener {
         for(StatField statField : StatField.values()){
             this.statLabels.get(statField).setText(statField.toString() + map.getStats(statField));
         }
-        this.dominatingGenomeText.setText("Dominating genome: \n" + map.stats.dominatingGenome);
+        this.dominatingGenomeText.setText("Dominating genome: \n" + map.stats.getDominatingGenome());
         displayStatisticOfAnimalBeingObserved();
     }
 

@@ -84,23 +84,17 @@ public class Animal implements Comparable {
     public Animal mate(Animal other){
         if(this.canMate() && other.canMate()){
 
+            List<Vector2d> positionsNearParents = new ArrayList<>();
             Vector2d randomPositionNearParents;
-            int i = 0;
-            do {
-                randomPositionNearParents = this.getPosition().add(MapDirection.NORTH.randomDirection().toUnitVector());
-                i++;
-            }while(map.isOccupied(randomPositionNearParents) && i<8);
+            MapDirection direction = MapDirection.NORTH;
 
-            i=0;
-            while(map.isOccupied(randomPositionNearParents) && i<8){
-                MapDirection nextDir = MapDirection.NORTH;
-                randomPositionNearParents = this.getPosition().add(nextDir.toUnitVector());
-                nextDir = nextDir.fromInt(nextDir.toInt()+1);
-                i++;
+            for(int i=0; i<8; i++){
+                Vector2d position = this.position.add(direction.toUnitVector());
+                if(map.isOccupied(position)) positionsNearParents.add(position);
             }
 
-            if(map.isOccupied(randomPositionNearParents))
-                randomPositionNearParents   = this.getPosition().add(MapDirection.NORTH.randomDirection().toUnitVector());
+            if(!positionsNearParents.isEmpty()) randomPositionNearParents = this.map.randomPositionOf(positionsNearParents);
+            else randomPositionNearParents = this.position.add(direction.randomDirection().toUnitVector());
 
             Animal child = new Animal(this.startEnergy, (int) ((this.energy + other.energy) * 0.25), this.moveEnergy, new Genome(this.genome, other.genome), map);
 
@@ -110,7 +104,6 @@ public class Animal implements Comparable {
 
             child.position = randomPositionNearParents;
             child.position = map.convertToAllowedPosition(child.position);
-
 
             if(map.chosenAnimal!=null)
                 child.isSuccessor = (this.isSuccessor || other.isSuccessor) && child.birthDate>=map.chosenAnimal.observeDate;

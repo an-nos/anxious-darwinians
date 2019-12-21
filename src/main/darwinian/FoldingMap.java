@@ -277,8 +277,6 @@ public class FoldingMap implements IAnimalStateChangeObserver {
     }
 
     private void growNewPlants(){
-//        int jungleArea = this.getJungleHeight()*this.getJungleWidth();
-//        int i = 0;
 
         if(!this.freePositionsInJungle.isEmpty()) {
             Vector2d positionInsideJungle = this.randomPositionOf(freePositionsInJungle);

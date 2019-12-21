@@ -43,7 +43,7 @@ public class SwingVisualizer implements IMapStateChangeObserver {
 
 
         if(this.secondMap == null) this.mapPanelSize = new Vector2d(600, 600);
-        else this.mapPanelSize = new Vector2d(380, 380);
+        else this.mapPanelSize = new Vector2d(400, 400);
 
         this.sidePanelSize = new Vector2d( 350, this.mapPanelSize.y);
         this.frameSize = new Vector2d(this.mapPanelSize.x+this.sidePanelSize.x+20, this.mapPanelSize.y+38);

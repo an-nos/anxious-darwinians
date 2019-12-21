@@ -77,6 +77,5 @@ public class World {
     //TODO: Get top ever genome in statistics
     //TODO: THREADS?
     //TODO: repair size of window
-    //TODO: hashmap of free positions
 
 }

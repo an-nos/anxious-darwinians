@@ -74,20 +74,6 @@ public class MapStats {
 
     void updateChildrenCount(){ this.childrenCount++; }
 
-    private void setCurrentAnimalCount() {
-        StatField numOfAnimals = StatField.NUM_OF_ANIMALS;
-        this.stats.put(numOfAnimals, this.map.getAnimalsSize());
-    }
-
-    private void setCurrentPlantCount() {
-        this.stats.put(StatField.NUM_OF_PLANTS, this.map.getPlantsSize());
-    }
-
-    private void setAvgLifespan(){
-        if(this.deadCount == 0) this.stats.put(StatField.AVG_LIFESPAN_DEAD, 0);
-        else this.stats.put(StatField.AVG_LIFESPAN_DEAD, this.lifeSpanSum / this.deadCount);
-    }
-
     private void setCurrentAverageAnimalEnergy() {
         if(this.stats.get(StatField.NUM_OF_ANIMALS) == 0){
             this.stats.put(StatField.AVG_ENERGY, 0);
@@ -99,18 +85,6 @@ public class MapStats {
             sumOfEnergy+=animal.getEnergy();
         }
         this.stats.put(StatField.AVG_ENERGY, sumOfEnergy / this.stats.get(StatField.NUM_OF_ANIMALS));
-    }
-
-    private void setBornToday(){
-        this.stats.put(StatField.BORN_TODAY, this.childrenCount);
-    }
-
-    private void setAvgChildrenCount(){
-        if(this.deadCount!=0) this.stats.put(StatField.AVG_CHILDREN, this.childrenCount/this.stats.get(StatField.NUM_OF_ANIMALS));
-    }
-
-    private void setDay(){
-        this.stats.put(StatField.DAY, this.map.getAge());
     }
 
     private void updateTotals(){
@@ -141,15 +115,39 @@ public class MapStats {
         return avgStats;
     }
 
+    private void setStat(StatField stat) {
+        switch (stat) {
+            case DAY:
+                this.stats.put(StatField.DAY, this.map.getAge());
+                break;
+            case NUM_OF_ANIMALS:
+                this.stats.put(stat, this.map.getAnimalsSize());
+                break;
+            case NUM_OF_PLANTS:
+                this.stats.put(stat, this.map.getPlantsSize());
+                break;
+            case GENOME_OCCURRENCES:
+                this.setDominatingGenome();
+                break;
+            case AVG_LIFESPAN_DEAD:
+                if (this.deadCount == 0) this.stats.put(stat, 0);
+                else this.stats.put(stat, this.lifeSpanSum / this.deadCount);
+                break;
+            case AVG_ENERGY:
+                this.setCurrentAverageAnimalEnergy();
+                break;
+            case BORN_TODAY:
+                this.stats.put(stat, this.childrenCount);
+                break;
+            case AVG_CHILDREN:
+                if (this.stats.get(StatField.NUM_OF_ANIMALS) != 0)
+                    this.stats.put(StatField.AVG_CHILDREN, this.childrenCount / this.stats.get(StatField.NUM_OF_ANIMALS));
+                break;
+        }
+    }
+
     public void updateAllStats() {
-        this.setDay();
-        this.setDominatingGenome();
-        this.setCurrentAnimalCount();
-        this.setCurrentPlantCount();
-        this.setCurrentAverageAnimalEnergy();
-        this.setAvgChildrenCount();
-        this.setBornToday();
-        this.setAvgLifespan();
+        for(StatField stat : StatField.values()) setStat(stat);
         this.updateTotals();
         this.childrenCount = 0;
     }
